@@ -1,4 +1,6 @@
 # baari-mikko
-Code for Arduino Mega
-drinkkiautomaatin toiminnalisuudessa ohjataan 9kpl releitä jotka kytkevät käyttösähkön pumpuille
-Loistavaa
+Code for Rasberry pi 4B 4gb 
+
+The script should control 9 pumps that will deliver the liquids to the drink glass
+Pumps are controlled with 4 power control units
+HD camera for face recognition
