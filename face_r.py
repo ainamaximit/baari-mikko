@@ -9,7 +9,7 @@ import threading
 startTime = time.time()
 
 # from face_r import recognize
-# recognize(3, learn())
+# recognize(5)
 
 # Declare queue and its methods
 class Queue:
@@ -66,12 +66,10 @@ def camera(x):
 
 def compare(times, known, video_capture):
     # plug in known face_encoding and face_names
-    #print(known)
     known_face_encodings = known[0]
     known_face_names = known[1]
 
     # Initialize default #0 camera
-    # video_capture = cv2.VideoCapture(0)
     for i in range(times):
         # Grab a single frame of video
         ret, frame = video_capture.read()
