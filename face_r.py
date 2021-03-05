@@ -4,12 +4,39 @@ import numpy as np
 import os
 import sys
 import time
+import threading
 
-# from face_r import learn, recognice
-# recognice(3, learn())
+startTime = time.time()
 
-def learn():
+# from face_r import recognize
+# recognize(3, learn())
+
+# Declare queue and its methods
+class Queue:
+    def __init__(self):
+        self.queue = []
+
+    def enqueue(self, data):
+        self.queue.append(data)
+
+    def dequeue(self, data):
+        data = None
+        try:
+            data = self.queue.pop(0)
+        except IndexError as ex:
+            pass
+        return data
+
+    def is_empty(self):
+        return len(self.queue) == 0
+
+# Create queues for threads
+q1 = Queue()
+q2 = Queue()
+
+def learn(x):
     # Iterate over folder of faces and create arrays of known face encodings and their names
+    print('Learning initialize.')
     known_face_encodings = []
     known_face_names = []
     directory = r'faces'
@@ -26,17 +53,25 @@ def learn():
             continue
 
     print('Learned ',len(known_face_names), ' face(s).')
-    return [known_face_encodings, known_face_names]
+    known = [known_face_encodings, known_face_names]
+    return known
 
 # pass in times to recognice and known_face_names and known_face_encodings
 # Improve: store faces in database and learn oly when neccessary
-def recognice(times, known):
+def camera(x):
+    print('Camera initialize.')
+    video_capture = cv2.VideoCapture(0)
+    print('Camera ready.')
+    return video_capture
+
+def compare(times, known, video_capture):
     # plug in known face_encoding and face_names
+    #print(known)
     known_face_encodings = known[0]
     known_face_names = known[1]
 
     # Initialize default #0 camera
-    video_capture = cv2.VideoCapture(0)
+    # video_capture = cv2.VideoCapture(0)
     for i in range(times):
         # Grab a single frame of video
         ret, frame = video_capture.read()
@@ -71,10 +106,31 @@ def recognice(times, known):
     # Improve: validate over multiple recognitions instead of the last one
     return name
 
-# Declare main function
-def main():
-    recognice(3, learn())
+# Threaded
+def recognize(times):
+    # Face learning thread
+    t1 = threading.Thread(target=lambda q1, arg: q1.enqueue(learn(arg)), args=(q1,1))
+
+    # Camera thread
+    t2 = threading.Thread(target=lambda q2, arg: q2.enqueue(camera(arg)), args=(q2,1))
+
+    # Start threads
+    t1.start()
+    t2.start()
+
+    # Wait for threads to finish
+    t1.join()
+    t2.join()
+
+    # Take photos x times to compare
+    compare(times,q1.dequeue(learn),q2.dequeue(camera))
+    print(time.time() - startTime)
+# Non threaded
+def recognize_sync(times):
+    compare(times,learn(1),camera(1))
+    print(time.time() - startTime)
 
 if __name__ == '__main__':
-    # Run from console
-    main()
+    # Run from console and take 5 photos to compare
+    recognize(5)
+    # recognize_sync(5)
