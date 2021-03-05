@@ -1,5 +1,11 @@
 {% extends "layout.html" %}
 
 {% block body %}
-    <h1>Hello, Worlds!</h1>
+  <h1>
+    {% if name is defined %}
+      Hello, {{ name }}! <a href="/"> Back</a>
+    {% else %}
+      Hello, Worlds! <a href="/face"> Recognize me!</a>
+    {% endif %}
+  </h1>
 {% endblock %}
