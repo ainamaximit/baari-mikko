@@ -5,19 +5,10 @@ import os
 import sys
 import time
 
-# Usage: is somewhat broken still
-# from face_r import face_r
+# from face_r import learn, recognice
+# recognice(3, learn())
 
-def face_r():
-    # Initialize default #0 camera
-    video_capture = cv2.VideoCapture(0)
-    video = False
-
-    if len(sys.argv)>=2:
-        if sys.argv[1] == '--video':
-            video = True
-            print('Live video mode only')
-
+def learn():
     # Iterate over folder of faces and create arrays of known face encodings and their names
     known_face_encodings = []
     known_face_names = []
@@ -31,13 +22,22 @@ def face_r():
             # Add known face encodings and their names to correponding arrays
             known_face_encodings.append(face_encoding)
             known_face_names.append(os.path.splitext(filename)[0])
-
         else:
             continue
 
-    print('Known faces ',known_face_names)
+    print('Learned ',len(known_face_names), ' face(s).')
+    return [known_face_encodings, known_face_names]
 
-    while True:
+# pass in times to recognice and known_face_names and known_face_encodings
+# Improve: store faces in database and learn oly when neccessary
+def recognice(times, known):
+    # plug in known face_encoding and face_names
+    known_face_encodings = known[0]
+    known_face_names = known[1]
+
+    # Initialize default #0 camera
+    video_capture = cv2.VideoCapture(0)
+    for i in range(times):
         # Grab a single frame of video
         ret, frame = video_capture.read()
 
@@ -48,7 +48,7 @@ def face_r():
         face_locations = face_recognition.face_locations(rgb_frame)
         face_encodings = face_recognition.face_encodings(rgb_frame, face_locations)
         if not face_locations:
-            name = None
+            name = "no_face"
 
         # Loop through each face in this frame of video
         for (top, right, bottom, left), face_encoding in zip(face_locations, face_encodings):
@@ -63,36 +63,18 @@ def face_r():
             if matches[best_match_index]:
                 name = known_face_names[best_match_index]
 
-            # if --video argument is set draw image
-            if video:
-                # Draw a box around the face
-                cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
-
-                # Draw a label with a name below the face
-                cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
-                font = cv2.FONT_HERSHEY_DUPLEX
-                cv2.putText(frame, name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
-            else:
-                continue
-        # if --video argument is set render image
-        if video:
-            # Display the resulting image
-            cv2.imshow('Video', frame)
-
-            # Hit 'q' on the keyboard to quit!
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
-        else:
-            print(name)
-            # return name
-            time.sleep(1)
+        print(name)
 
     # Release handle to the webcam
     video_capture.release()
-    cv2.destroyAllWindows()
 
+    # Improve: validate over multiple recognitions instead of the last one
+    return name
+
+# Declare main function
 def main():
-    face_r()
+    recognice(3, learn())
 
 if __name__ == '__main__':
+    # Run from console
     main()
