@@ -121,13 +121,17 @@ def recognize(times):
     t2.join()
 
     # Take photos x times to compare
-    compare(times,q1.dequeue(learn),q2.dequeue(camera))
-    print(time.time() - startTime)
-# Non threaded
-def recognize_sync(times):
-    compare(times,learn(1),camera(1))
+    name = compare(times,q1.dequeue(learn),q2.dequeue(camera))
+
     print(time.time() - startTime)
 
+    return name
+# Non threaded
+def recognize_sync(times):
+    name = compare(times,learn(1),camera(1))
+    print(time.time() - startTime)
+
+    return name
 if __name__ == '__main__':
     # Run from console and take 5 photos to compare
     recognize(5)
