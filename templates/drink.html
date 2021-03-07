@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+
+{% block body %}
+  {% if drinks is defined %}
+    <form action="/if_recipe" method="post">
+      <select name="drink">
+        {% for drink in drinks %}
+          {% if drink_select == drink.0 %}
+          <option  selected="selected" value="{{ drink.0 }}">{{ drink.0 }}</option>
+          {% else %}
+          <option value="{{ drink.0 }}">{{ drink.0 }}</option>
+          {% endif %}
+        {% endfor %}
+      </select>
+      <input type="submit">
+    </form>
+    {% if drink_recipe %}
+      <h1>Recipe is {{ drink_recipe }}</h1>
+    {% else %}
+      <h1>Cannot make {{ drink_select }} right now.</h1>
+    {% endif %}
+  {% else %}
+    Error!
+  {% endif %}
+{% endblock %}
