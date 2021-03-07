@@ -14,8 +14,8 @@ def face():
     name = recognize(1).capitalize()
     return render_template('index.html', name=name)
 
-@app.route('/recipe', methods=['GET','POST'])
-def recipe():
+@app.route('/recipes', methods=['GET','POST'])
+def recipes():
     drinks = get_drinks()
     drink = request.form.get('drink')
     drink_recipe = recipe(drink)
