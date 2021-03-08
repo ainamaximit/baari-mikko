@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request
 from face_r import recognize
-from db_query import recipe, get_drinks
+from db_query import get_all_drinks, get_availble_recipe
 
 app = Flask(__name__)
 
@@ -16,8 +16,8 @@ def face():
 
 @app.route('/recipes', methods=['GET','POST'])
 def recipes():
-    drinks = get_drinks()
+    drinks = get_all_drinks()
     drink = request.form.get('drink')
-    drink_recipe = recipe(drink)
+    drink_recipe = get_availble_recipe(drink)
     drink_select = drink
     return render_template('drink.html', drink_recipe=drink_recipe, drinks=drinks, drink_select=drink_select)
