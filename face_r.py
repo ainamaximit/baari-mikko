@@ -64,6 +64,8 @@ def camera(x):
     print('Camera ready.')
     return video_capture
 
+
+
 def compare(times, known, video_capture):
     # plug in known face_encoding and face_names
     known_face_encodings = known[0]
