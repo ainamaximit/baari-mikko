@@ -1,11 +1,39 @@
 {% extends "layout.html" %}
 
-{% block body %}
-  <h1>
-    {% if name is defined %}
-      Hello, {{ name }}! <a href="/"> Back</a>
-    {% else %}
-      Hello, Worlds! <a href="/face"> Recognize me!</a>
+{% block top%}
+
+    <div onclick="window.location='/login/drinks';" class="top_small button green2">
+      DRINKS
+    </div>
+
+    {% if name != None %}
+      <div onclick="window.location='/login/history';" class="top_small button green2">
+        HISTORY (TBA)
+      </div>
     {% endif %}
-  </h1>
+
+    <div onclick="window.location='/login';"  class="top_big button green2">
+      {% if name != None %}
+        Logged in as {{ name }}
+      {% else %}
+        LOG IN
+      {% endif %}
+    </div>
+
+    {% if name != None %}
+      <div onclick="window.location='{{ url_for('logout') }}';" class="top_small button green2">
+        LOGOUT
+      </div>
+      <div onclick="window.location='/admin';"  class="top_small button green2">
+        ADMIN
+      </div>
+    {% endif %}
+
+{% endblock %}
+{% block body %}
+
+  <div class="video_container">
+    <img id="live" src="/live_feed" class="video">
+  </div>
+
 {% endblock %}

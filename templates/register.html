@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+
+{% block top%}
+  <div onclick="window.location='{{ url_for('index') }}';" class="top_small button green2">
+    HOME
+  </div>
+  <div class="top_big button green2">
+    {% if name != None %}
+      Admin: {{ name }}
+    {% else %}
+      Baari-Mikko 0.1 beta - Error!
+    {% endif %}
+  </div>
+  {% if name != None %}
+  <div onclick="window.location='{{ url_for('logout') }}';" class="top_small button green2">
+    LOGOUT
+  </div>
+  {% endif %}
+{% endblock %}
+{% block body %}
+  <form action="/add_user" method="post" class="container">
+    <input type="text" name="username" class="item field" placeholder="Jeesus Nasaretilainen">
+    <input type="submit" value="Take photo and submit" class="button item green">
+  </form>
+  <div class="video_container">
+    <img src="/live_feed" class="video">
+  </div>
+{% endblock %}
