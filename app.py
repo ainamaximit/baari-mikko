@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, Response, redirect, session, 
 from facecam import compare, camera_feed, capture, learn
 from db_query import get_all_drinks, get_availble_recipe, get_users_names, get_recipes, get_recipe
 
+
 app = Flask(__name__, static_url_path='/static')
 # key for sessions(cookie)
 app.secret_key = 'penis'

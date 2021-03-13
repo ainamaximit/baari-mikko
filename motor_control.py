@@ -1,6 +1,6 @@
 import time
 from time import sleep
-from RPi.GPIO import GPIO
+import RPi.GPIO as GPIO
 
 ## Mockup stuff
 recipes = [
@@ -46,14 +46,43 @@ def ml_to_pump_time(ml):
 
 ## Initial setup
 # Allocate necessary output pins
+GPIO.cleanup()
 GPIO.setmode(GPIO.BCM)
-for i in range(1, 18+1):
-    GPIO.setup(i, GPIO.OUT)
+# for i in range(1, 18+1):
+#     GPIO.setup(i, GPIO.OUT)
 
 # Create pump PWM instances
-pumps = {}
-for ing in pump_configuration:
-    pumps[ing] = GPIO.PWM(pump_configuration[ing], 50)  # FIXME Does 50Hz work?
+# pumps = {}
+# for ing in pump_configuration:
+#     pumps[ing] = GPIO.PWM(pump_configuration[ing], 50)  # FIXME Does 50Hz work?
+
+
+def test_pump():
+    dc = 0
+    hz = 100
+    # pump = pumps["vodka"]
+    GPIO.setup(21, GPIO.OUT)
+    pump = GPIO.PWM(21, hz)
+    try:
+        print('Starting pump')
+        pump.start(dc)
+    except:
+        print(f"Lol pump {pump} didn't start")
+        raise
+
+    # sleep(5)
+
+    for i in range(100, 50, -1):
+        print(f'Setting dc to {i}')
+        pump.ChangeDutyCycle(i)
+        sleep(0.2)
+
+    try:
+        print('Stopping pump')
+        pump.stop()
+    except:
+        print(f"Lol pump {pump} didn't stop")
+        raise
 
 
 ## Pump control function
@@ -83,5 +112,4 @@ def make_drink(recipe):
 
         sleep(100) # FIXME Is checking every 0.1 enough or too much?
         time = time.time() - start_time
-
 
