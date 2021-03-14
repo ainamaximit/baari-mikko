@@ -1,6 +1,7 @@
 import psycopg2
 from psycopg2 import OperationalError, DatabaseError
 
+
 def create_connection(db_name, db_user, db_password, db_host):
     connection = None
     try:
@@ -14,6 +15,7 @@ def create_connection(db_name, db_user, db_password, db_host):
     except OperationalError as e:
         print(f"The error '{e}' occurred in db_query.py create_connection()")
     return connection
+
 
 def executemany_insert_query(connection, query, vars):
     cursor = connection.cursor()
@@ -30,6 +32,7 @@ def executemany_insert_query(connection, query, vars):
         print(f"The error '{e}' occurred in db_query.py executemany_insert_query()")
         return False
 
+
 # gets connection, query and vars to plug in
 def execute_insert_query(connection, query, vars):
     cursor = connection.cursor()
@@ -45,6 +48,7 @@ def execute_insert_query(connection, query, vars):
         print(f"The error '{e}' occurred in db_query.py execute_insert_query()")
         return False
 
+
 def execute_read_query(connection, query, vars):
     cursor = connection.cursor()
 
@@ -57,6 +61,7 @@ def execute_read_query(connection, query, vars):
 
     except DatabaseError as e:
         print(f"The error '{e}' occurred in db_query.py execute_read_query()")
+
 
 def get_all_drinks():
     # Connect
@@ -71,6 +76,7 @@ def get_all_drinks():
 
     result = execute_read_query(connection, query, vars)
     return result
+
 
 def get_available_drinks():
     # Connect
@@ -89,6 +95,7 @@ def get_available_drinks():
 
     result = execute_read_query(connection, query, vars)
     return result
+
 
 # Gets drink name
 # Rerturn recipe if available else None
@@ -115,6 +122,7 @@ def get_availble_recipe(drink):
     else:
         return None
 
+
 def get_recipe(drink):
     # Connect
     connection = create_connection(
@@ -122,7 +130,7 @@ def get_recipe(drink):
     )
 
     query = """
-    SELECT ingredients.ingredient, quantity FROM drinks
+    SELECT recipes.id, drinks.id, ingredients.id, quantity, drinks.drink, ingredients.ingredient FROM drinks
     JOIN recipes ON drinks.id = recipes.drink_id
     JOIN ingredients ON recipes.ingredient_id = ingredients.id
     WHERE drink=%s
@@ -134,6 +142,7 @@ def get_recipe(drink):
         return list(map(list, result))
     else:
         return None
+
 
 def get_recipes():
     # Connect
@@ -153,36 +162,59 @@ def get_recipes():
     print(result)
     return result
 
-def insert_recipe(recipe):
 
+def get_ingredients():
+    # Connect
     connection = create_connection(
         "test1", "mikko", "baari", "127.0.0.1"
     )
 
     query = """
-    INSERT INTO recipes (drink_id, ingredient_id, quantity)
-    VALUES (%s, %s, %s)
-    ON CONFLICT DO UPDATE
+    SELECT * FROM ingredients
+    """
+    vars = (None,)
+
+    result = execute_read_query(connection, query, vars)
+
+    print(result)
+    return result
+
+
+def insert_recipe(id, drink_id, ingredient_id, quantity):
+    connection = create_connection(
+        "test1", "mikko", "baari", "127.0.0.1"
+    )
+
+    query = """
+    INSERT INTO recipes (id, drink_id, ingredient_id, quantity)
+    VALUES (%s,%s,%s,%s)
+    ON CONFLICT (id)
+    DO UPDATE SET drink_id = EXCLUDED.drink_id, ingredient_id = EXCLUDED.ingredient_id, quantity = EXCLUDED.quantity;
     """
 
-    executemany_insert_query(connection, query, recipe)
+    variables = (id, drink_id, ingredient_id, quantity)
+
+    executemany_insert_query(connection, query, variables)
 
     return True
 
-def create_user(name, face_encoding, img_path):
+
+def create_user(name, face_encoding, img_path, admin):
     connection = create_connection(
         "test1", "mikko", "baari", "127.0.0.1"
     )
 
     query = """
-    INSERT INTO users (name, face, img)
-    VALUES (%s, %s, %s)
-    ON CONFLICT DO UPDATE
+    INSERT INTO users (name, face, img, admin)
+    VALUES (%s, %s, %s, %s)
+    ON CONFLICT (id)
+    DO UPDATE SET name=EXCLUDED.name, face=EXCLUDED.face, img=EXCLUDED.img
     """
 
-    vars = (name, face_encoding, img_path)
+    vars = (name, face_encoding, img_path, admin)
 
     return execute_insert_query(connection, query, vars)
+
 
 def get_users_faces():
     # Connect
@@ -197,6 +229,7 @@ def get_users_faces():
 
     result = execute_read_query(connection, query, vars)
     return result
+
 
 def get_users_names():
     # Connect
@@ -215,6 +248,42 @@ def get_users_names():
     print(result)
     return result
 
+
+def get_users():
+    # Connect
+    connection = create_connection(
+        "test1", "mikko", "baari", "127.0.0.1"
+    )
+
+    query = """
+    SELECT id, name, img FROM users
+    """
+    vars = (None,)
+
+    result = execute_read_query(connection, query, vars)
+
+    print(result)
+    return result
+
+
+def delete_user(id):
+    # Connect
+    connection = create_connection(
+        "test1", "mikko", "baari", "127.0.0.1"
+    )
+
+    query = """
+    DELETE FROM users
+    WHERE id=%s
+    """
+    vars = (id,)
+
+    result = execute_insert_query(connection, query, vars)
+
+    print(result)
+    return result
+
+
 def get_ingredients():
     # Connect
     connection = create_connection(
@@ -232,4 +301,4 @@ def get_ingredients():
 
 
 if __name__ == '__main__':
-    print(get_availble_recipe("Gin Tonic"))
+    print(get_recipe("Gin Tonic"))

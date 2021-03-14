@@ -31,19 +31,27 @@
           Peruuta "{{ drink_select }}" drinkin muokkaus.
         </button>
       </form>
-      <form class="container vertical" action="" method="post">
+      <form class="container vertical" action="/save_recipe" method="post">
         {% for ingredient in drink_recipe %}
           <div class="container" id="{{ ingredient[0] }}">
-          <label class="item20 field green" for="{{ ingredient[1] }}">{{ ingredient[0] }}</label>
+          <select name="D{{ ingredient[0] }}" class="item20 field green" >
+              {% for item in ingredients %}
+                  {% if item[0] == ingredient[2] %}
+                    <option selected="selected" value="{{ item[0] }}">{{ item[1] }}</option>
+                  {% else %}
+                     <option value="{{ item[0] }}">{{ item[1] }}</option>
+                  {% endif %}
+              {% endfor %}
+          </select>
           <input class="item button blue" onclick="document.getElementById('qty{{ ingredient[0] }}').stepUp(10);" type="button" name="" value="+">
-          <input class="item field" type="number" id="qty{{ ingredient[0] }}" name="{{ ingredient[0] }}" value="{{ ingredient[1] }}">
+          <input class="item field" type="number" id="qty{{ ingredient[0] }}" name="I{{ ingredient[0] }}" value="{{ ingredient[3] }}">
           <input class="item button blue" onclick="document.getElementById('qty{{ ingredient[0] }}').stepDown(10);" type="button" name="" value="-">
           <input class="item button red" type="button" onclick="document.getElementById('{{ ingredient[0] }}').remove();" name="" value="DELETE">
           </div>
         {% endfor %}
           <div class="container">
             <input type="button" class="button item" value="Lisää raaka-aine (TBA)">
-            <input type="button" class="button item" value="Tallenna muutokset (TBA)">
+            <input type="submit" class="button item" value="Tallenna muutokset">
             <input type="button" class="button item red" value="Poista drinkki (TBA)">
           </div>
       </form>

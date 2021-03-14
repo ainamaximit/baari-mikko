@@ -18,14 +18,16 @@
   {% endif %}
 {% endblock %}
 {% block body %}
-  <form action="/add_user" method="post" class="container">
-    <input type="text" name="username" class="item field" placeholder="Jeesus Nasaretilainen">
-      <div class="field blue item">
-        Admin: <input type="checkbox" name="admin" class="item field">
-      </div>
-    <input type="submit" value="Take photo and submit" class="button item green">
+  <form action="/del_user" method="post" class="container">
+    <select name="usertodel" class="button blue item">
+        <option value="">Valitse</option>
+        {% for user in all_users %}
+            <option value="{{ user[0] }}">{{ user[1] }}</option>
+        {% endfor %}
+    </select>
+    <button onclick="window.confirm('Are you sure?')" class="button red item" type="submit">DELETE</button>
   </form>
   <div class="video_container">
-    <img src="/live_feed" class="video">
+    <img src="" class="video">
   </div>
 {% endblock %}

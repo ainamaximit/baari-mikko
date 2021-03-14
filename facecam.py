@@ -1,27 +1,29 @@
 import face_recognition
 import cv2
 import numpy as np
-import os
-import sys
-import time
 import threading
 import pickle
 import hashlib
 from collections import Counter
 from db_query import create_user, get_users_faces
 
-global global_camera
+lock = threading.Lock()
+
 
 # Learns faces and inserts user into database
-def learn(name, img_path):
+def learn(name, img_path, admin):
     # learn face and insert into database
     try:
         if img_path.endswith(".jpg"):
             face = face_recognition.load_image_file('faces/'+img_path)
             face_encoding = face_recognition.face_encodings(face)[0]
             pickled = pickle.dumps(face_encoding)
+            admin_boolean = False
+            print(admin)
+            if admin == 'on':
+                admin_boolean = True
 
-            result = create_user(name, pickled, img_path)
+            result = create_user(name, pickled, img_path, admin_boolean)
 
             print(name+" learned and stored to db.")
             print(result)
@@ -30,47 +32,57 @@ def learn(name, img_path):
     except Exception as e:
         print(f"The error '{e}' occurred")
 
-# Create camera object and pass it along
-def camera_on():
-    try:
-        print('Camera initialize.')
-        video_capture = cv2.VideoCapture(0)
-        print('Camera ready.')
-        return video_capture
-    except Exception as e:
-        print(f"The error '{e}' occurred")
 
 # Create global camera object and turn camera on at app launch
 # IMPROVE: This might be unstable method. Should use lock?
-global_camera = camera_on()
+class VideoCamera(object):
+    def __init__(self):
+        self.cap = cv2.VideoCapture(0)
+        self.cap.set(3, 640)  # Use res.py to get supported resolutions
+        self.cap.set(4, 480)
+
+    def __del__(self):
+        self.cap.release()
+
+    def get_frame(self):
+        ret, frame = self.cap.read()
+        if ret:
+            ret, jpeg = cv2.imencode('.jpg', frame)
+            return jpeg.tobytes()
+
+    def read(self):
+        return self.cap.read()
+
+
+global video_camera
+video_camera = VideoCamera()
+
 
 # Camera feed to frontend
 # yields jpg frames
-# IMPROVE: should use lock to avoid simultanous read and write
-def camera_feed():
-    # Enter to endless loop while feed open
+def feed(video_camera):
+    if video_camera is None:
+        video_camera = VideoCamera()
     while True:
-        # Read camera frame
-        success, frame = global_camera.read()
-        if not success:
-            break
-        else:
-            ret, buffer = cv2.imencode('.jpg', frame)
-            frame = buffer.tobytes()
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # concat frame one by one and show result
+        with lock:
+            frame = video_camera.get_frame()
+
+            if frame is not None:
+                global_frame = frame
+                yield (b'--frame\r\n'
+                       b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+
 
 # IMPROVE: update to multithreaded to increse speed and accuracy
 # compares camera frames x(times) to face database
 # GETS: times (int, how many frames to recognize faces agains)
 # RETURNS: name (str, most appeared name in frame(s))
 def compare(times):
-    startTime = time.time()
     # plug in known face_encoding and face_names
     try:
         known_face_encodings = []
         known_face_names = []
-        x=0
+        x = 0
         users = get_users_faces()
 
         # get names and faces from database to dict
@@ -79,7 +91,7 @@ def compare(times):
             pickled = users[x][2]
             known_face_encodings.append(pickle.loads(pickled))
             known_face_names.append(users[x][1])
-            x+=1
+            x += 1
 
     except Exception as e:
         print(f"The error '{e}' occurred")
@@ -88,7 +100,7 @@ def compare(times):
     names = []
     for i in range(times):
         # Grab a single frame of video
-        ret, frame = global_camera.read()
+        ret, frame = video_camera.read()
 
         # Convert the image from BGR color (which OpenCV uses) to RGB color (which face_recognition uses)
         rgb_frame = frame[:, :, ::-1]
@@ -103,7 +115,6 @@ def compare(times):
         for (top, right, bottom, left), face_encoding in zip(face_locations, face_encodings):
             # See if the face is a match for the known face(s)
             matches = face_recognition.compare_faces(known_face_encodings, face_encoding)
-
             # Find best match for the known face(s)
             face_distances = face_recognition.face_distance(known_face_encodings, face_encoding)
             best_match_index = np.argmin(face_distances)
@@ -119,21 +130,24 @@ def compare(times):
     occurence_count = Counter(names)
     name = occurence_count.most_common(1)[0][0]
 
-    # Calculate time to run compare() and round it to ms
-    timer = time.time()-startTime
-    print('Facecam compare() runtime '+round(timer, 3)+' s')
-
     # return most common name in recognized frames
     return name
+
 
 # Captures photo and saves it to faces
 # Returns file name
 def capture(img_name):
     # hashes filename(username) to avoid any problem with caracters
     img_hash = hashlib.md5(img_name.encode('utf-8')).hexdigest()
-    return_value, image = global_camera.read()
+    return_value, image = video_camera.read()
     cv2.imwrite('faces/'+img_hash+'.jpg', image)
     # returns filename
     return img_hash+'.jpg'
 
+
 if __name__ == '__main__':
+    username = input()
+    img_path = capture(username)
+    # lear returns boolean
+    # learn learns captured image and saves face mappings to database
+    response = learn(username, img_path)
