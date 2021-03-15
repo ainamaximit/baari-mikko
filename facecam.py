@@ -142,7 +142,6 @@ def compare(times, users):
 
 
 # Captures photo and saves it to faces
-# Returns file name
 def capture(img_name):
     # hashes filename(username) to avoid any problem with caracters
     img_hash = hashlib.md5(img_name.encode('utf-8')).hexdigest()
@@ -171,8 +170,22 @@ def get_camera_resolutions():
 
 
 if __name__ == '__main__':
-    username = input()
-    img_path = capture(username)
-    # lear returns boolean
-    # learn learns captured image and saves face mappings to database
-    response = learn(username, img_path, True)
+    """
+    Create root user with admin rights
+    """
+    from databaseinterface import DatabaseInterface
+    from databasequeries import DatabaseQueries as Dbq
+    dbi = DatabaseInterface("test1", "mikko", "baari", "127.0.0.1")
+    username = 'root'
+    img_path = 'root.jpg'
+    print('Create root user from faces/root.jpg')
+    ask = input('Y/N?')
+    if ask in ('Y', 'y', 'yes', 'Yes', 'YES'):
+        try:
+            pickled = learn(username, img_path)
+            args = (username, pickled, img_path, True)
+            dbi.execute_query(Dbq.CREATE_USER, args)
+        except Exception as e:
+            print(e)
+    else:
+        print('cancelled by user')

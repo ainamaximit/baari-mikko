@@ -133,7 +133,7 @@ def admin():
     :return: Admin view
     """
     name = current_user.id
-    if current_user.id == "Niko Rintamäki":
+    if current_user.id in ("Niko Rintamäki", 'root'):
         return render_template('admin.html', name=name)
     else:
         return redirect(url_for('index'))
@@ -146,7 +146,7 @@ def add_user():
     TODO: comment
     :return:
     """
-    if current_user.id == "Niko Rintamäki":
+    if current_user.id in ("Niko Rintamäki", 'root'):
         username = request.form.get('username')
         administrator = request.form.get('admin')
         admin_boolean = False
@@ -185,7 +185,7 @@ def register():
     :return:
     """
     name = current_user.id
-    if current_user.id == "Niko Rintamäki":
+    if current_user.id in ("Niko Rintamäki", 'root'):
         return render_template('register.html', name=name)
     else:
         return redirect(url_for('index'))
@@ -199,7 +199,7 @@ def recipes():
     :return:
     """
     name = current_user.id
-    if current_user.id == "Niko Rintamäki":
+    if current_user.id in ("Niko Rintamäki", 'root'):
         all_drinks = dbi.read_query(Dbq.ALL_DRINKS)
         ingredients = dbi.read_query(Dbq.ALL_INGREDIENTS)
         drink_select = request.form.get('drink')
