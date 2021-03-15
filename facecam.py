@@ -4,8 +4,8 @@ import numpy as np
 import threading
 import pickle
 import hashlib
+import pandas as pd
 from collections import Counter
-from db_query import create_user, get_users_faces
 
 lock = threading.Lock()
 
@@ -77,13 +77,12 @@ def feed(video_camera):
 # compares camera frames x(times) to face database
 # GETS: times (int, how many frames to recognize faces agains)
 # RETURNS: name (str, most appeared name in frame(s))
-def compare(times):
+def compare(times, users):
     # plug in known face_encoding and face_names
     try:
         known_face_encodings = []
         known_face_names = []
         x = 0
-        users = get_users_faces()
 
         # get names and faces from database to dict
         # pickle converts bytes data back to n-dimensional array
@@ -143,6 +142,24 @@ def capture(img_name):
     cv2.imwrite('faces/'+img_hash+'.jpg', image)
     # returns filename
     return img_hash+'.jpg'
+
+
+def get_camera_resolutions():
+    url = "https://en.wikipedia.org/wiki/List_of_common_resolutions"
+    table = pd.read_html(url)[0]
+    table.columns = table.columns.droplevel()
+
+    cap = cv2.VideoCapture(0)
+    resolutions = {}
+
+    for index, row in table[["W", "H"]].iterrows():
+        cap.set(cv2.CAP_PROP_FRAME_WIDTH, row["W"])
+        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, row["H"])
+        width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
+        height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
+        resolutions[str(width)+"x"+str(height)] = "OK"
+
+    print(resolutions)
 
 
 if __name__ == '__main__':
