@@ -11,3 +11,5 @@ numpy==1.20.1
 opencv-python==4.5.1.48
 Pillow==8.1.1
 psycopg2==2.8.6
+Flask_Login==0.5.0
+pandas==1.2.3
