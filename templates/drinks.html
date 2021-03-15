@@ -21,7 +21,7 @@
     {% if drinks is defined and name!=None %}
       <form action="/mix_drink" method="post" class="container">
         {% for drink in drinks|sort %}
-          <input type="submit" name="drink" value="{{ drink.1 }}" class="button item green">
+          <input type="submit" name="drink" value="{{ drink }}" class="button item green">
         {% endfor %}
       </form>
     {% else %}
