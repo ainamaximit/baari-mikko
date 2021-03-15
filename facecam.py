@@ -1,3 +1,9 @@
+"""This is facecam module.
+
+Recognizes faces for Baari-Mikko.
+"""
+
+
 import face_recognition
 import cv2
 import numpy as np
@@ -7,27 +13,29 @@ import hashlib
 import pandas as pd
 from collections import Counter
 
+
 lock = threading.Lock()
 
 
 # Learns faces and inserts user into database
-def learn(name, img_path, admin):
+def learn(name, img_path):
+    """
+    Creates n-dimensional face mappings in pickled format to store in database
+    :param name: Username str
+    :param img_path: Image name str
+    :return: Pickled face mapping
+    """
     # learn face and insert into database
     try:
         if img_path.endswith(".jpg"):
             face = face_recognition.load_image_file('faces/'+img_path)
             face_encoding = face_recognition.face_encodings(face)[0]
             pickled = pickle.dumps(face_encoding)
-            admin_boolean = False
-            print(admin)
-            if admin == 'on':
-                admin_boolean = True
 
-            result = create_user(name, pickled, img_path, admin_boolean)
+            # result = create_user(name, pickled, img_path, admin_boolean)
 
             print(name+" learned and stored to db.")
-            print(result)
-            return True
+            return pickled
 
     except Exception as e:
         print(f"The error '{e}' occurred")
@@ -167,4 +175,4 @@ if __name__ == '__main__':
     img_path = capture(username)
     # lear returns boolean
     # learn learns captured image and saves face mappings to database
-    response = learn(username, img_path)
+    response = learn(username, img_path, True)

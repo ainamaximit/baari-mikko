@@ -1,8 +1,8 @@
-from flask import Flask, render_template, request, Response, redirect, session, url_for
+from flask import Flask, render_template, request, Response, redirect, url_for
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
 from facecam import compare, capture, learn, feed, VideoCamera
 from databaseinterface import DatabaseInterface
-from databasequeries import DatabaseQueries as dbq
+from databasequeries import DatabaseQueries as Dbq
 import json
 
 dbi = DatabaseInterface("test1", "mikko", "baari", "127.0.0.1")
@@ -32,13 +32,13 @@ class User(UserMixin):
 
 
 @login_manager.user_loader
-def load_user(id):
+def load_user(name):
     """
     Loader for users. Flask-Login depends this.
-    :param id: User string (name)
+    :param name: User string (name)
     :return: User object from user class
     """
-    user = User(id)
+    user = User(name)
     return user
 
 
@@ -47,13 +47,13 @@ def login():
     """
     Logs user in if face recognition matches the user database.
     Login is done by @login_required decorator
-    TODO: Review this quick implementation and improvre safety if needed
+    TODO: Review this quick implementation and improve safety if needed
     :return: Redirect to protected page that was requested if login valid.
     """
     # get list of users
-    result = dbi.read_query(dbq.USERS_NAMES)
+    result = dbi.read_query(Dbq.USERS_NAMES)
     users = [i[0] for i in result]
-    faces = dbi.read_query(dbq.USERS_FACES)
+    faces = dbi.read_query(Dbq.USERS_FACES)
     name = compare(5, faces)
     if name in users:
         next_page = request.args.get('next')
@@ -92,6 +92,10 @@ def logout():
 
 @app.route('/live_feed')
 def live_feed():
+    """
+    Img stream for camera device.
+    :return: img stream
+    """
     # Return camera frames as jpg
     return Response(feed(video_camera), mimetype='multipart/x-mixed-replace; boundary=frame')
 
@@ -104,7 +108,7 @@ def drinks():
     :return: Drinks view.
     """
     name = current_user.id
-    result = dbi.read_query(dbq.AVAILABLE_DRINKS)
+    result = dbi.read_query(Dbq.AVAILABLE_DRINKS)
     all_drinks = [item for t in result for item in t]
     return render_template('drinks.html', name=name, drinks=all_drinks)
 
@@ -117,7 +121,7 @@ def mix_drink():
     :return: JSON recipe of drink from post
     """
     drink = request.form.get('drink')
-    drink_recipe = json.dumps(dbi.read_query(dbq.AVAILABLE_RECIPE, drink))
+    drink_recipe = json.dumps(dbi.read_query(Dbq.AVAILABLE_RECIPE, drink))
     return drink_recipe
 
 
@@ -138,37 +142,48 @@ def admin():
 @app.route('/add_user', methods=['POST'])
 @login_required
 def add_user():
-    name = current_user.id
+    """
+    TODO: comment
+    :return:
+    """
     if current_user.id == "Niko Rintamäki":
-        return render_template('admin.html', name=name)
         username = request.form.get('username')
-        admin = request.form.get('admin')
+        administrator = request.form.get('admin')
+        admin_boolean = False
+        if administrator == 'on':
+            admin_boolean = True
         img_path = capture(username)
-        # TODO: rewrite to use new database plugins
-        response = learn(username, img_path, admin)
-        # IMPROVE: if face learned stay on page
-        if response is True:
-            return redirect(url_for('register'))
-        else:
-            return redirect(url_for('index'))
+        pickled = learn(username, img_path)
+        args = (username, pickled, img_path, admin_boolean)
+        dbi.execute_query(Dbq.CREATE_USER, args)
+        return redirect(url_for('admin'))
     else:
         return redirect(url_for('index'))
 
 
-@app.route('/del_user', methods=['POST','GET'])
+@app.route('/del_user', methods=['POST', 'GET'])
 @login_required
 def del_user():
+    """
+    TODO: comment
+    :return:
+    """
     if request.method == 'POST':
         usertodel = request.form.get('usertodel')
-        response = dbi.execute_query(dbq.DELETE_USER, usertodel)
+        response = dbi.execute_query(Dbq.DELETE_USER, (usertodel,))
         print(response)
     # username from POST
-    all_users = dbi.read_query(dbq.USERS)
+    all_users = dbi.read_query(Dbq.USERS)
     return render_template('delete.html', all_users=all_users)
 
 
 @app.route('/register')
+@login_required
 def register():
+    """
+    TODO: comment
+    :return:
+    """
     name = current_user.id
     if current_user.id == "Niko Rintamäki":
         return render_template('register.html', name=name)
@@ -177,13 +192,18 @@ def register():
 
 
 @app.route('/recipes', methods=['GET', 'POST'])
+@login_required
 def recipes():
+    """
+    TODO: Edit recipes functionality
+    :return:
+    """
     name = current_user.id
     if current_user.id == "Niko Rintamäki":
-        all_drinks = dbi.read_query(dbq.ALL_DRINKS)
-        ingredients = dbi.read_query(dbq.ALL_INGREDIENTS)
+        all_drinks = dbi.read_query(Dbq.ALL_DRINKS)
+        ingredients = dbi.read_query(Dbq.ALL_INGREDIENTS)
         drink_select = request.form.get('drink')
-        drink_recipe = dbi.read_query(dbq.RECIPE, drink_select)
+        drink_recipe = dbi.read_query(Dbq.RECIPE, drink_select)
         return render_template('recipes.html', name=name, drink_select=drink_select, drinks=all_drinks,
                                drink_recipe=drink_recipe, ingredients=ingredients)
     else:

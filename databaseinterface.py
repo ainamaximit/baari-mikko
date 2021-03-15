@@ -51,7 +51,7 @@ class DatabaseInterface:
             print(f"The error '{e}' occurred in db_query.py executemany_insert_query()")
             return False
 
-    def execute_query(self, query, *args):
+    def execute_query(self, query, args):
         """
         gets connection, query and vars to plug in
         :param query: PostgreSQL query to execute
