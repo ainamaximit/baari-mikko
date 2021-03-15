@@ -64,6 +64,11 @@ class DatabaseQueries:
             SELECT name FROM users
             """
 
+    USER_IS_ADMIN = """
+            SELECT admin FROM users
+            WHERE name=%s
+            """
+
     USERS = """
             SELECT id, name, img FROM users
             """
