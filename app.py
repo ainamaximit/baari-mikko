@@ -27,8 +27,17 @@ class User(UserMixin):
     Our app only uses name for auth.
     TODO: Improve security.
     """
+
     def __init__(self, username):
         self.id = username
+        self.admin = False
+        result = dbi.read_query(Dbq.USER_IS_ADMIN, (username,))
+        if result:
+            if result[0][0]:
+                self.admin = result[0][0]
+                print('admin')
+        else:
+            print('empty')
 
 
 @login_manager.user_loader
@@ -39,6 +48,8 @@ def load_user(name):
     :return: User object from user class
     """
     user = User(name)
+
+
     return user
 
 
@@ -53,12 +64,14 @@ def login():
     # get list of users
     result = dbi.read_query(Dbq.USERS_NAMES)
     users = [i[0] for i in result]
+    print(users)
     faces = dbi.read_query(Dbq.USERS_FACES)
     name = compare(5, faces)
     if name in users:
         next_page = request.args.get('next')
         user = User(name)
-        print(name)
+        print(user.id)
+        print(user.admin)
         login_user(user)
         return redirect(next_page)
     else:
@@ -132,8 +145,10 @@ def admin():
     TODO: Admin validation
     :return: Admin view
     """
+    print(current_user.id)
+    print(current_user.admin)
     name = current_user.id
-    if current_user.id in ("Niko Rintamäki", 'root'):
+    if current_user.admin:
         return render_template('admin.html', name=name)
     else:
         return redirect(url_for('index'))
@@ -146,7 +161,7 @@ def add_user():
     TODO: comment
     :return:
     """
-    if current_user.id in ("Niko Rintamäki", 'root'):
+    if current_user.admin:
         username = request.form.get('username')
         administrator = request.form.get('admin')
         admin_boolean = False
@@ -185,7 +200,7 @@ def register():
     :return:
     """
     name = current_user.id
-    if current_user.id in ("Niko Rintamäki", 'root'):
+    if current_user.admin:
         return render_template('register.html', name=name)
     else:
         return redirect(url_for('index'))
@@ -199,7 +214,7 @@ def recipes():
     :return:
     """
     name = current_user.id
-    if current_user.id in ("Niko Rintamäki", 'root'):
+    if current_user.admin:
         all_drinks = dbi.read_query(Dbq.ALL_DRINKS)
         ingredients = dbi.read_query(Dbq.ALL_INGREDIENTS)
         drink_select = request.form.get('drink')
