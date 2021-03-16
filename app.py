@@ -35,9 +35,10 @@ class User(UserMixin):
         if result:
             if result[0][0]:
                 self.admin = result[0][0]
-                print('admin')
-        else:
-            print('empty')
+
+    @staticmethod
+    def is_admin(self):
+        return self.admin
 
 
 @login_manager.user_loader
@@ -48,7 +49,6 @@ def load_user(name):
     :return: User object from user class
     """
     user = User(name)
-
 
     return user
 
@@ -64,14 +64,11 @@ def login():
     # get list of users
     result = dbi.read_query(Dbq.USERS_NAMES)
     users = [i[0] for i in result]
-    print(users)
     faces = dbi.read_query(Dbq.USERS_FACES)
     name = compare(5, faces)
     if name in users:
         next_page = request.args.get('next')
         user = User(name)
-        print(user.id)
-        print(user.admin)
         login_user(user)
         return redirect(next_page)
     else:
@@ -85,11 +82,17 @@ def index():
     This is homepage.
     :return: Index view
     """
+
     if current_user.is_authenticated:
+        logged = current_user.is_authenticated
+        admin = current_user.is_admin
         name = current_user.id
     else:
+        logged = False
+        admin = False
         name = None
-    return render_template('index.html', name=name)
+
+    return render_template('index.html', logged=logged, name=name, admin=admin)
 
 
 @app.route("/logout")
@@ -122,8 +125,8 @@ def drinks():
     """
     name = current_user.id
     result = dbi.read_query(Dbq.AVAILABLE_DRINKS)
-    all_drinks = [item for t in result for item in t]
-    return render_template('drinks.html', name=name, drinks=all_drinks)
+    available_drinks = [item for t in result for item in t]
+    return render_template('drinks.html', name=name, drinks=available_drinks)
 
 
 @app.route('/mix_drink', methods=['GET', 'POST'])
@@ -145,8 +148,6 @@ def admin():
     TODO: Admin validation
     :return: Admin view
     """
-    print(current_user.id)
-    print(current_user.admin)
     name = current_user.id
     if current_user.admin:
         return render_template('admin.html', name=name)
@@ -185,8 +186,7 @@ def del_user():
     """
     if request.method == 'POST':
         usertodel = request.form.get('usertodel')
-        response = dbi.execute_query(Dbq.DELETE_USER, (usertodel,))
-        print(response)
+        dbi.execute_query(Dbq.DELETE_USER, (usertodel,))
     # username from POST
     all_users = dbi.read_query(Dbq.USERS)
     return render_template('delete.html', all_users=all_users)
