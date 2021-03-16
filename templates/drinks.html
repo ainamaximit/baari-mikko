@@ -1,30 +1,31 @@
 {% extends "layout.html" %}
 
-{% block top%}
-  <div onclick="window.location='{{ url_for('index') }}';" class="top_small button green2">
-    HOME
-  </div>
-  <div onclick="window.location='{{ url_for('drinks') }}';"  class="top_big button green2">
-    {% if name != None %}
-      Hei {{ name }}, tilaa jotain!
-    {% else %}
-      Baari-Mikko 0.1 beta - Please log in
-    {% endif %}
-  </div>
-  {% if name != None %}
-  <div onclick="window.location='{{ url_for('logout') }}';" class="top_small button green2">
-    LOGOUT
-  </div>
-  {% endif %}
+{% block top %}
+
+    <div style="order: 1;" onclick="window.location='{{ url_for('index') }}';" class="top_small button green2">
+        TAKAISIN
+    </div>
+
+    <div style="order: 2;" class="top_big button green2">
+        {{ name }}, tilaa jotain!
+    </div>
+
+    <div style="order: 5;" onclick="window.location='{{ url_for('logout') }}';" class="top_small button green2">
+        KIRJAUDU ULOS
+    </div>
+
 {% endblock %}
+
 {% block body %}
-    {% if drinks is defined and name!=None %}
-      <form action="/mix_drink" method="post" class="container">
+
+    <form action="{{ url_for('mix_drink') }}" method="post" class="container">
+
         {% for drink in drinks|sort %}
-          <input type="submit" name="drink" value="{{ drink }}" class="button item green">
+
+            <input type="submit" name="drink" value="{{ drink }}" class="button item green">
+
         {% endfor %}
-      </form>
-    {% else %}
-      Please login!
-    {% endif %}
+
+    </form>
+
 {% endblock %}

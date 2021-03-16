@@ -1,31 +1,33 @@
 {% extends "layout.html" %}
 
-{% block top%}
-  <div onclick="window.location='{{ url_for('admin') }}';" class="top_small button green2">
-    BACK
-  </div>
-  <div class="top_big button green2">
-    {% if name != None %}
-      Admin: {{ name }}
-    {% else %}
-      Baari-Mikko 0.1 beta - Error!
-    {% endif %}
-  </div>
-  {% if name != None %}
-  <div onclick="window.location='{{ url_for('logout') }}';" class="top_small button green2">
-    LOGOUT
-  </div>
-  {% endif %}
+{% block top %}
+
+    <div style="order: 1;" onclick="window.location='{{ url_for('admin') }}';" class="top_small button green2">
+        TAKAISIN
+    </div>
+
+    <div style="order: 2;" class="top_big button green2">
+        REKISTERÖI KÄYTTÄJÄ
+    </div>
+
+    <div style="order: 5;" onclick="window.location='{{ url_for('logout') }}';" class="top_small button green2">
+        KIRJAUDU ULOS
+    </div>
+
 {% endblock %}
+
 {% block body %}
-  <form action="/add_user" method="post" class="container">
-    <input type="text" name="username" class="item field" placeholder="Jeesus Nasaretilainen">
-      <div class="field blue item">
-        Admin: <input type="checkbox" name="admin" class="item field">
-      </div>
-    <input type="submit" value="Take photo and submit" class="button item green">
-  </form>
-  <div class="video_container">
-    <img src="/live_feed" class="video">
-  </div>
+
+    <form action="{{ url_for('add_user') }}" method="post" class="container">
+        <input type="text" name="username" class="item field" placeholder="Etunimi Sukunimi">
+        <div class="field blue item">
+            Ylläpitäjä: <input type="checkbox" name="admin" class="item field">
+        </div>
+        <input type="submit" value="Rekisteröi" class="button item green">
+    </form>
+
+    <div class="video_container">
+        <img id="live" src="{{ url_for('live_feed') }}" class="video" alt="No stream.">
+    </div>
+
 {% endblock %}

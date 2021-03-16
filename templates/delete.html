@@ -1,33 +1,35 @@
 {% extends "layout.html" %}
 
-{% block top%}
-  <div onclick="window.location='{{ url_for('admin') }}';" class="top_small button green2">
-    BACK
-  </div>
-  <div class="top_big button green2">
-    {% if name != None %}
-      Admin: {{ name }}
-    {% else %}
-      Baari-Mikko 0.1 beta - Error!
-    {% endif %}
-  </div>
-  {% if name != None %}
-  <div onclick="window.location='{{ url_for('logout') }}';" class="top_small button green2">
-    LOGOUT
-  </div>
-  {% endif %}
+{% block top %}
+
+    <div style="order: 1;" onclick="window.location='{{ url_for('admin') }}';" class="top_small button green2">
+        TAKAISIN
+    </div>
+
+    <div style="order: 2;" class="top_big button green2">
+        POISTA KÄYTTÄJIÄ
+    </div>
+
+    <div style="order: 5;" onclick="window.location='{{ url_for('logout') }}';" class="top_small button green2">
+        KIRJAUDU ULOS
+    </div>
+
 {% endblock %}
+
 {% block body %}
-  <form action="/del_user" method="post" class="container">
-    <select name="usertodel" class="button blue item">
-        <option value="">Valitse</option>
-        {% for user in all_users %}
-            <option value="{{ user[0] }}">{{ user[1] }}</option>
-        {% endfor %}
-    </select>
-    <button onclick="window.confirm('Are you sure?')" class="button red item" type="submit">DELETE</button>
-  </form>
-  <div class="video_container">
-    <img src="" class="video">
-  </div>
+
+    <form action="{{ url_for('del_user') }}" method="post" class="container">
+        <select name="usertodel" class="button blue item">
+            <option value="">Valitse</option>
+
+            {% for user in all_users %}
+
+                <option value="{{ user[0] }}"> {{ user[1] }}</option>
+
+            {% endfor %}
+
+        </select>
+        <button onclick="window.confirm('Poistamista ei voi perua, oletko varma?')" class="button red item" type="submit">POISTA</button>
+    </form>
+
 {% endblock %}

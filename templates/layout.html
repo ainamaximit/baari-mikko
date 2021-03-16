@@ -1,15 +1,18 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
-  <head>
+    <head>
+        <meta charset="utf-8">
+        <title>Baari-Mikko</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    </head>
+    <body>
+        <div class="top_container">
 
-    <meta charset="utf-8">
-    <title>Baari-Mikko</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-  </head>
-  <body>
-    <div class="top_container">
-      {% block top %}{% endblock %}
-    </div>
-    {% block body %}{% endblock %}
-  </body>
+            {% block top %}{% endblock %}
+
+        </div>
+
+            {% block body %}{% endblock %}
+
+    </body>
 </html>

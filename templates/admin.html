@@ -1,32 +1,33 @@
 {% extends "layout.html" %}
 
-{% block top%}
-  <div onclick="window.location='{{ url_for('index') }}';" class="top_small button green2">
-    HOME
-  </div>
-  <div class="top_big button green2">
-    {% if name != None %}
-      Admin: {{ name }}
-    {% else %}
-      Baari-Mikko 0.1 beta - Error!
-    {% endif %}
-  </div>
-  {% if name != None %}
-  <div onclick="window.location='{{ url_for('logout') }}';" class="top_small button green2">
-    LOGOUT
-  </div>
-  {% endif %}
+{% block top %}
+
+    <div style="order: 1;" onclick="window.location='{{ url_for('index') }}';" class="top_small button green2">
+        TAKAISIN
+    </div>
+
+    <div style="order: 2;" class="top_big button green2">
+        Ylläpito - {{ name }}
+    </div>
+
+    <div style="order: 5;" onclick="window.location='{{ url_for('logout') }}';" class="top_small button green2">
+        KIRJAUDU ULOS
+    </div>
+
 {% endblock %}
+
 {% block body %}
-  <div class="container">
-    <div onclick="window.location='{{ url_for('recipes') }}';" class="button item green">
-      Muokkaa reseptejä
+
+    <div class="container">
+        <div onclick="window.location='{{ url_for('recipes') }}';" class="button item green">
+            Muokkaa reseptejä
+        </div>
+        <div onclick="window.location='{{ url_for('register') }}';" class="button item green">
+            Lisää käyttäjä
+        </div>
+        <div onclick="window.location='{{ url_for('del_user') }}';" class="button item red">
+            Poista käyttäjä
+        </div>
     </div>
-    <div onclick="window.location='{{ url_for('register') }}';" class="button item green">
-      Lisää käyttäjä
-    </div>
-      <div onclick="window.location='{{ url_for('del_user') }}';" class="button item red">
-      Poista käyttäjä
-    </div>
-  </div>
+
 {% endblock %}

@@ -67,10 +67,12 @@ body {
 }
 
 .top_small {
-  flex-grow: 1;
+    flex-grow: 1;
+    flex-basis: 0;
 }
 .top_big {
-  flex-grow: 4;
+    flex-grow: 4;
+    flex-basis: 0;
 }
 
 .video_container {

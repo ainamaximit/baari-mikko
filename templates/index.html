@@ -2,38 +2,46 @@
 
 {% block top %}
 
-    <div onclick="window.location='{{ url_for('drinks') }}';" class="top_small button green2">
-      DRINKS
+    <div style="order: 1;" onclick="window.location='{{ url_for('drinks') }}';" class="top_small button green2">
+        TILAA
     </div>
 
-    {% if name != None %}
-      <div onclick="window.location='{{ url_for('index') }}';" class="top_small button green2">
-        HISTORY (TBA)
-      </div>
-    {% endif %}
+    {% if logged %}
 
-    <div onclick="window.location='/login?next=index';"  class="top_big button green2">
-      {% if name != None %}
-        Logged in as {{ name }}
-      {% else %}
-        LOG IN
-      {% endif %}
-    </div>
+        <div style="order: 2;" onclick="window.location='{{ url_for('index') }}';" class="top_small button green2">
+            *HISTORIA*
+        </div>
 
-    {% if name != None %}
-      <div onclick="window.location='{{ url_for('logout') }}';" class="top_small button green2">
-        LOGOUT
-      </div>
-      <div onclick="window.location='{{ url_for('admin') }}';"  class="top_small button green2">
-        ADMIN
-      </div>
+        <div style="order: 5;" onclick="window.location='{{ url_for('logout') }}';" class="top_small button green2">
+            KIRJAUDU ULOS
+        </div>
+
+        <div style="order: 2;" onclick="window.location='{{ url_for('index') }}';" class="top_big button green2">
+            {{ name }}
+        </div>
+
+        {% if admin %}
+
+            <div style="order: 4;" onclick="window.location='{{ url_for('admin') }}';"  class="top_small button green2">
+                YLLÄPITO
+            </div>
+
+        {% endif %}
+
+    {% else %}
+
+        <div style="order: 3;" onclick="window.location='/login?next=index';"  class="top_big button green2">
+            KIRJAUDU
+        </div>
+
     {% endif %}
 
 {% endblock %}
+
 {% block body %}
 
-  <div class="video_container">
-    <img id="live" src="{{ url_for('live_feed') }}" class="video">
-  </div>
+    <div class="video_container">
+        <img id="live" src="{{ url_for('live_feed') }}" class="video" alt="No stream.">
+    </div>
 
 {% endblock %}
