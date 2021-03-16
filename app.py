@@ -25,7 +25,6 @@ class User(UserMixin):
     """
     User class for login. Has all necessary features provided by UserMixin class.
     Our app only uses name for auth.
-    TODO: Improve security.
     """
 
     def __init__(self, username):
@@ -39,40 +38,6 @@ class User(UserMixin):
     @staticmethod
     def is_admin(self):
         return self.admin
-
-
-@login_manager.user_loader
-def load_user(name):
-    """
-    Loader for users. Flask-Login depends this.
-    :param name: User string (name)
-    :return: User object from user class
-    """
-    user = User(name)
-
-    return user
-
-
-@app.route('/login')
-def login():
-    """
-    Logs user in if face recognition matches the user database.
-    Login is done by @login_required decorator
-    TODO: Review this quick implementation and improve safety if needed
-    :return: Redirect to protected page that was requested if login valid.
-    """
-    # get list of users
-    result = dbi.read_query(Dbq.USERS_NAMES)
-    users = [i[0] for i in result]
-    faces = dbi.read_query(Dbq.USERS_FACES)
-    name = compare(5, faces)
-    if name in users:
-        next_page = request.args.get('next')
-        user = User(name)
-        login_user(user)
-        return redirect(next_page)
-    else:
-        return redirect(url_for('index'))
 
 
 @app.route("/", methods=["GET"])
@@ -95,25 +60,48 @@ def index():
     return render_template('index.html', logged=logged, name=name, admin=admin)
 
 
+@login_manager.user_loader
+def load_user(name):
+    """
+    Loader for users. Flask-Login depends this.
+    :param name: User string (name)
+    :return: User object from user class
+    """
+    user = User(name)
+
+    return user
+
+
+@app.route('/login')
+def login():
+    """
+    Logs user in if face recognition matches the user database.
+    Login is verified by @login_required decorator
+    :return: Redirect to protected page that was requested if login valid.
+    """
+    # get list of users
+    result = dbi.read_query(Dbq.USERS_NAMES)
+    users = [i[0] for i in result]
+    faces = dbi.read_query(Dbq.USERS_FACES)
+    name = compare(5, faces)
+    if name in users:
+        next_page = request.args.get('next')
+        user = User(name)
+        login_user(user)
+        return redirect(next_page)
+    else:
+        return redirect(url_for('index'))
+
+
 @app.route("/logout")
 @login_required
 def logout():
     """
-    Logs user out.
+    Logs user out using Flask-Login.
     :return: Redirect index view.
     """
     logout_user()
     return redirect(url_for('index'))
-
-
-@app.route('/live_feed')
-def live_feed():
-    """
-    Img stream for camera device.
-    :return: img stream
-    """
-    # Return camera frames as jpg
-    return Response(feed(video_camera), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
 @app.route('/drinks')
@@ -133,7 +121,7 @@ def drinks():
 @login_required
 def mix_drink():
     """
-    TODO: Makes drink activating pump_controller.py
+    TODO: Makes drink by activating pump_controller.py
     :return: JSON recipe of drink from post
     """
     drink = request.form.get('drink')
@@ -145,7 +133,8 @@ def mix_drink():
 @login_required
 def admin():
     """
-    TODO: Admin validation
+    Administrator view.
+    Has links to create user, change recipes, etc.
     :return: Admin view
     """
     name = current_user.id
@@ -155,12 +144,29 @@ def admin():
         return redirect(url_for('index'))
 
 
+@app.route('/register')
+@login_required
+def register():
+    """
+    Register user form
+    :return: Register view
+    """
+    if current_user.admin:
+        return render_template('register.html')
+    else:
+        return redirect(url_for('index'))
+
+
 @app.route('/add_user', methods=['POST'])
 @login_required
 def add_user():
     """
-    TODO: comment
-    :return:
+    Form functionality to add user to database.
+    Captures photo of user and saves it to faces.
+    Then creates facemapping for facerecognition.
+    Finally stores them to database with user name and admin boolean.
+    :gets: name, admin from POST
+    :return: redirection
     """
     if current_user.admin:
         username = request.form.get('username')
@@ -181,29 +187,16 @@ def add_user():
 @login_required
 def del_user():
     """
-    TODO: comment
-    :return:
+    Shows list of users to delete.
+    Handles POST to delete user permanently from database.
+    TODO: delete stored photo
+    :return: delete user view
     """
     if request.method == 'POST':
         usertodel = request.form.get('usertodel')
         dbi.execute_query(Dbq.DELETE_USER, (usertodel,))
-    # username from POST
     all_users = dbi.read_query(Dbq.USERS)
     return render_template('delete.html', all_users=all_users)
-
-
-@app.route('/register')
-@login_required
-def register():
-    """
-    TODO: comment
-    :return:
-    """
-    name = current_user.id
-    if current_user.admin:
-        return render_template('register.html', name=name)
-    else:
-        return redirect(url_for('index'))
 
 
 @app.route('/recipes', methods=['GET', 'POST'])
@@ -223,3 +216,13 @@ def recipes():
                                drink_recipe=drink_recipe, ingredients=ingredients)
     else:
         return redirect(url_for('index'))
+
+
+@app.route('/live_feed')
+def live_feed():
+    """
+    Img stream from camera. Use this as img source in html or css.
+    :return: image
+    """
+    # Return camera frames as jpg
+    return Response(feed(video_camera), mimetype='multipart/x-mixed-replace; boundary=frame')
