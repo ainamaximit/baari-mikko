@@ -24,6 +24,10 @@ python3 -m venv venv
 pip install -r requirements.txt
 ```
 
+### Database
+
+Project depends on PostgreSQL database. Dump file test1.pgsql included.
+
 ### Running dev server
 
 1. Activate virtualenv
@@ -33,5 +37,14 @@ pip install -r requirements.txt
 
 2. Run server
 ```bash
-flask app.py
+flask run
+```
+
+## Usage
+
+### Initial setup
+
+Register root user running code below and follow instructions
+```bash
+python facecam.py
 ```
