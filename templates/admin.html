@@ -19,8 +19,11 @@
 {% block body %}
 
     <div class="container">
+        <div onclick="window.location='{{ url_for('pumps') }}';" class="button item green">
+            Pumppujen raaka-aineet
+        </div>
         <div onclick="window.location='{{ url_for('recipes') }}';" class="button item green">
-            Muokkaa reseptejä
+            *Muokkaa reseptejä*
         </div>
         <div onclick="window.location='{{ url_for('register') }}';" class="button item green">
             Lisää käyttäjä
