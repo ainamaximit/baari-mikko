@@ -77,3 +77,14 @@ class DatabaseQueries:
             DELETE FROM users
             WHERE id=%s
             """
+
+    GET_PUMPS_INGREDIENTS = """
+        SELECT pumps.id, ingredients.id, ingredients.ingredient FROM pumps
+        LEFT JOIN ingredients on pumps.ingredient_id = ingredients.id
+    """
+
+    SET_PUMP_INGREDIENTS = """
+        INSERT INTO pumps (id, ingredient_id)
+        VALUES (%s, (NULLIF(%s,'None')::integer))
+        ON CONFLICT (id) DO UPDATE SET id = EXCLUDED.id, ingredient_id = EXCLUDED.ingredient_id
+    """
