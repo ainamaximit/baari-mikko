@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, Response, redirect, url_for
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
-from facecam import compare, capture, learn, feed, VideoCamera
+from facecam import compare, capture, learn, feed, CameraStream
 from databaseinterface import DatabaseInterface
 from databasequeries import DatabaseQueries as Dbq
 import json
@@ -14,11 +14,14 @@ login_manager.login_view = "login"
 app.secret_key = 'penis'
 
 
-global video_camera
-video_camera = None
+vs = CameraStream(src=0).start()
 
-if video_camera is None:
-    video_camera = VideoCamera()
+
+# global video_camera
+# video_camera = None
+
+# if video_camera is None:
+#     video_camera = VideoCamera()
 
 
 class User(UserMixin):
@@ -83,7 +86,7 @@ def login():
     result = dbi.read_query(Dbq.USERS_NAMES)
     users = [i[0] for i in result]
     faces = dbi.read_query(Dbq.USERS_FACES)
-    name = compare(5, faces)
+    name = compare(5, faces, vs)
     if name in users:
         next_page = request.args.get('next')
         user = User(name)
@@ -121,7 +124,7 @@ def drinks():
 @login_required
 def mix_drink():
     """
-    TODO: Makes drink by activating pump_controller.py
+    TODO: Makes drink by activating motor_control.py
     :return: JSON recipe of drink from post
     """
     drink = request.form.get('drink')
@@ -174,7 +177,7 @@ def add_user():
         admin_boolean = False
         if administrator == 'on':
             admin_boolean = True
-        img_path = capture(username)
+        img_path = capture(username, vs)
         pickled = learn(username, img_path)
         args = (username, pickled, img_path, admin_boolean)
         dbi.execute_query(Dbq.CREATE_USER, args)
@@ -225,4 +228,4 @@ def live_feed():
     :return: image
     """
     # Return camera frames as jpg
-    return Response(feed(video_camera), mimetype='multipart/x-mixed-replace; boundary=frame')
+    return Response(feed(vs), mimetype='multipart/x-mixed-replace; boundary=frame')
