@@ -1,0 +1,60 @@
+{% extends "layout.html" %}
+
+{% block top %}
+
+    <div style="order: 1;" onclick="window.location='{{ url_for('admin') }}';" class="top_small button green2">
+        TAKAISIN
+    </div>
+
+    <div style="order: 2;" class="top_big button green2">
+        Raaka-aineet pumpuilla
+    </div>
+
+    <div style="order: 5;" onclick="window.location='{{ url_for('logout') }}';" class="top_small button green2">
+        KIRJAUDU ULOS
+    </div>
+
+{% endblock %}
+
+{% block body %}
+
+    <form action="{{ url_for('pumps') }}" method="post" class="grid3">
+
+        {% for pump in atpumps|sort %}
+
+            <div class="field item green">
+                <div>Pumppu {{ pump[0] }}</div>
+                <select id="{{ pump[0] }}" name="{{ pump[0] }}" class="item blue">
+
+                    <option value="None">Tyhjä</option>
+
+                    {% for item in ingredients|sort(attribute=1) %}
+
+                        {% if item[0] == pump[1] %}
+
+                            <option selected="selected" value="{{ item[0] }}">{{ item[1] }}</option>
+
+                        {% else %}
+
+                            <option value="{{ item[0] }}">{{ item[1] }}</option>
+
+                        {% endif %}
+
+                    {% endfor %}
+
+                </select>
+            </div>
+
+        {% endfor %}
+
+        <input class="lightred button item" type="reset" value="Palauta kentät">
+        <input class="red button item" type="button" value="Tyhennä kentät" onclick="for (let i = 1;i<=9;i++) {document.getElementById(i.toString()).value = 'None'}">
+        <input class="green button item" type="submit" value="Tallenna muutokset">
+
+    </form>
+
+    <script>
+    for (let i = 0;i<10;i++) {document.getElementById(id).value = 'None'}
+    </script>
+
+{% endblock %}
