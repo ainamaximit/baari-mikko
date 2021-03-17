@@ -12,9 +12,51 @@ import pickle
 import hashlib
 import pandas as pd
 from collections import Counter
+import time
 
 
 lock = threading.Lock()
+
+
+class CameraStream:
+    """
+    Camera object.
+    TODO: commenting
+    """
+    def __init__(self, src=0):
+        # initialize the video camera stream and read the first frame
+        # from the stream
+        self.stream = cv2.VideoCapture(src)
+        (self.grabbed, self.frame) = self.stream.read()
+        # initialize the variable used to indicate if the thread should
+        # be stopped
+        self.stopped = False
+        self.int = 1
+
+    def start(self):
+        # start the thread to read frames from the video stream
+        threading.Thread(target=self.update, args=()).start()
+        print(f'Camera thread {self.int} running')
+        self.int += 1
+        return self
+
+    def update(self):
+        # keep looping infinitely until the thread is stopped
+        while True:
+            # if the thread indicator variable is set, stop the thread
+            if self.stopped:
+                return
+            # otherwise, read the next frame from the stream
+            (self.grabbed, self.frame) = self.stream.read()
+            time.sleep(0.030)
+
+    def read(self):
+        # return the frame most recently read
+        return self.frame
+
+    def stop(self):
+        # indicate that the thread should be stopped
+        self.stopped = True
 
 
 # Learns faces and inserts user into database
@@ -41,51 +83,22 @@ def learn(name, img_path):
         print(f"The error '{e}' occurred")
 
 
-# Create global camera object and turn camera on at app launch
-# IMPROVE: This might be unstable method. Should use lock?
-class VideoCamera(object):
-    def __init__(self):
-        self.cap = cv2.VideoCapture(0)
-        self.cap.set(3, 640)  # Use res.py to get supported resolutions
-        self.cap.set(4, 480)
-
-    def __del__(self):
-        self.cap.release()
-
-    def get_frame(self):
-        ret, frame = self.cap.read()
-        if ret:
-            ret, jpeg = cv2.imencode('.jpg', frame)
-            return jpeg.tobytes()
-
-    def read(self):
-        return self.cap.read()
-
-
-global video_camera
-video_camera = VideoCamera()
-
-
 # Camera feed to frontend
 # yields jpg frames
-def feed(video_camera):
-    if video_camera is None:
-        video_camera = VideoCamera()
+def feed(vs):
     while True:
-        with lock:
-            frame = video_camera.get_frame()
-
-            if frame is not None:
-                global_frame = frame
-                yield (b'--frame\r\n'
-                       b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+        frame = vs.read()
+        asd, jpeg = cv2.imencode('.jpg', frame)
+        frame = jpeg.tobytes()
+        yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+        time.sleep(0.030)
 
 
 # IMPROVE: update to multithreaded to increse speed and accuracy
 # compares camera frames x(times) to face database
 # GETS: times (int, how many frames to recognize faces agains)
 # RETURNS: name (str, most appeared name in frame(s))
-def compare(times, users):
+def compare(times, users, vs):
     # plug in known face_encoding and face_names
     try:
         known_face_encodings = []
@@ -107,7 +120,7 @@ def compare(times, users):
     names = []
     for i in range(times):
         # Grab a single frame of video
-        ret, frame = video_camera.read()
+        frame = vs.read()
 
         # Convert the image from BGR color (which OpenCV uses) to RGB color (which face_recognition uses)
         rgb_frame = frame[:, :, ::-1]
@@ -142,10 +155,10 @@ def compare(times, users):
 
 
 # Captures photo and saves it to faces
-def capture(img_name):
+def capture(img_name, vs):
     # hashes filename(username) to avoid any problem with caracters
     img_hash = hashlib.md5(img_name.encode('utf-8')).hexdigest()
-    return_value, image = video_camera.read()
+    image = vs.read()
     cv2.imwrite('faces/'+img_hash+'.jpg', image)
     # returns filename
     return img_hash+'.jpg'
