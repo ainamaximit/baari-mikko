@@ -129,7 +129,8 @@ def mix_drink():
     """
     drink = request.form.get('drink')
     drink_recipe = json.dumps(dbi.read_query(Dbq.AVAILABLE_RECIPE, drink))
-    return drink_recipe
+    time = 60
+    return render_template('pumping.html', drink=drink, time=time)
 
 
 @app.route('/admin')
@@ -217,6 +218,24 @@ def recipes():
         drink_recipe = dbi.read_query(Dbq.RECIPE, drink_select)
         return render_template('recipes.html', name=name, drink_select=drink_select, drinks=all_drinks,
                                drink_recipe=drink_recipe, ingredients=ingredients)
+    else:
+        return redirect(url_for('index'))
+
+
+@app.route('/pumps', methods=['GET', 'POST'])
+@login_required
+def pumps():
+    if current_user.admin:
+        if request.method == 'POST':
+            for i in request.form:
+                x = request.form.get(i)
+                print(f'Set {x} for pump {i}')
+                dbi.execute_query(Dbq.SET_PUMP_INGREDIENTS, (i, x))
+
+        atpumps = dbi.read_query(Dbq.GET_PUMPS_INGREDIENTS)
+        ingredients = dbi.read_query(Dbq.ALL_INGREDIENTS)
+
+        return render_template('pumps.html', atpumps=atpumps, ingredients=ingredients)
     else:
         return redirect(url_for('index'))
 
