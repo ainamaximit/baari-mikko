@@ -17,6 +17,11 @@ body {
   width: 100vw;
   flex-wrap: wrap;
 }
+.grid3 {
+  display: grid;
+  width: 100vw;
+  grid-template-columns: 33% 34% 33%;
+}
 .item {
   flex-grow: 1;
   font-size: 18px;
@@ -55,6 +60,9 @@ body {
 }
 .red {
   background-color: #AA4400;
+}
+.lightred {
+  background-color: #AA8844;
 }
 .blue {
   background-color: #0044AA;
