@@ -27,7 +27,7 @@
     </form>
 
     <div class="video_container">
-        <img id="live" src="{{ url_for('live_feed') }}" class="video" alt="No stream.">
+        <img id="live" src="{{ url_for('live_feed') }}" class="video" style="transform: scaleX(-1);" alt="No stream.">
     </div>
 
 {% endblock %}
