@@ -34,13 +34,13 @@
     </div>
 
     <script>
-    var i = 0;
+    let i = 0;
     function move() {
-        if (i == 0) {
+        if (i === 0) {
             i = 1;
-            var elem = document.getElementById("myBar");
-            var width = 1;
-            var id = setInterval(frame, 1*{{ time }});
+            const elem = document.getElementById("myBar");
+            let width = 1;
+            let id = setInterval(frame, 1*{{ time }});
             function frame() {
                 if (width >= 100) {
                     clearInterval(id);
@@ -49,7 +49,7 @@
                 } else {
                     width+=0.1;
                     elem.style.width = width + "%";
-                    document.getElementById('Per').innerHTML = Math.round(width, 0) + " %";
+                    document.getElementById('Per').innerHTML = Math.round(width) + " %";
                 }
             }
         }
