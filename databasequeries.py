@@ -2,7 +2,7 @@ class DatabaseQueries:
     """
     Database queries for DatabaseConnector
     PostgreSQL
-    TODO
+    Database schema.jpg and dump file included
     """
     ALL_DRINKS = """
             SELECT id, drink FROM drinks

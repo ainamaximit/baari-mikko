@@ -5,7 +5,6 @@ from databaseinterface import DatabaseInterface
 from databasequeries import DatabaseQueries as Dbq
 import json
 
-dbi = DatabaseInterface("test1", "mikko", "baari", "127.0.0.1")
 
 app = Flask(__name__, static_url_path='/static')
 login_manager = LoginManager()
@@ -13,24 +12,16 @@ login_manager.init_app(app)
 login_manager.login_view = "login"
 app.secret_key = 'penis'
 
-
 vs = CameraStream(src=0).start()
-
-
-# global video_camera
-# video_camera = None
-
-# if video_camera is None:
-#     video_camera = VideoCamera()
+dbi = DatabaseInterface("test1", "mikko", "baari", "127.0.0.1")
 
 
 class User(UserMixin):
-    """
-    User class for login. Has all necessary features provided by UserMixin class.
-    Our app only uses name for auth.
-    """
-
     def __init__(self, username):
+        """
+        UserMixin class extension for Flask-Login.
+        :param username: Users name in database
+        """
         self.id = username
         self.admin = False
         result = dbi.read_query(Dbq.USER_IS_ADMIN, (username,))
@@ -38,8 +29,11 @@ class User(UserMixin):
             if result[0][0]:
                 self.admin = result[0][0]
 
-    @staticmethod
     def is_admin(self):
+        """
+        Tells if current user is admin
+        :return: Boolean, is current user admin
+        """
         return self.admin
 
 
@@ -53,14 +47,14 @@ def index():
 
     if current_user.is_authenticated:
         logged = current_user.is_authenticated
-        admin = current_user.is_admin
+        isadmin = current_user.is_admin
         name = current_user.id
     else:
         logged = False
-        admin = False
+        isadmin = False
         name = None
 
-    return render_template('index.html', logged=logged, name=name, admin=admin)
+    return render_template('index.html', logged=logged, name=name, admin=isadmin)
 
 
 @login_manager.user_loader
@@ -130,7 +124,7 @@ def mix_drink():
     drink = request.form.get('drink')
     drink_recipe = json.dumps(dbi.read_query(Dbq.AVAILABLE_RECIPE, drink))
     time = 60
-    return render_template('pumping.html', drink=drink, time=time)
+    return render_template('pumping.html', drink=drink, time=time, drink_recipe=drink_recipe)
 
 
 @app.route('/admin')

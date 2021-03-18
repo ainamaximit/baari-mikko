@@ -3,11 +3,15 @@ from psycopg2 import OperationalError, DatabaseError
 
 
 class DatabaseInterface:
-    """
-    Database interface for PostgreSQL
-    TODO
-    """
+    """ Database interface for PostgreSQL """
     def __init__(self, db_name, db_user, db_password, db_host):
+        """
+        Database setting.
+        :param db_name: db name
+        :param db_user: database role name
+        :param db_password: db password
+        :param db_host: db address
+        """
         self.__db_name = db_name
         self.__db_user = db_user
         self.__db_password = db_password
@@ -67,7 +71,7 @@ class DatabaseInterface:
             return True
 
         except DatabaseError as e:
-            print(f"The error '{e}' occurred in DatabaseInterface")
+            print(f"The error '{e}' occurred in DatabaseInterface execute_query()")
             return False
 
     def read_query(self, query, *args):
