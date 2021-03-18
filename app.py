@@ -80,7 +80,7 @@ def login():
     result = dbi.read_query(Dbq.USERS_NAMES)
     users = [i[0] for i in result]
     faces = dbi.read_query(Dbq.USERS_FACES)
-    name = compare(5, faces, vs)
+    name = compare(3, faces, vs)
     if name in users:
         next_page = request.args.get('next')
         user = User(name)
