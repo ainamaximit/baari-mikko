@@ -100,20 +100,50 @@ def feed(vs):
         time.sleep(0.030)
 
 
-def compare(times, users, vs):
+def recognize(food):
+    frame = food[0]
+    known_faces = food[1]
+    known_face_names = []
+    known_face_encodings = []
+    for user in known_faces:
+        known_face_names.append(user[0])
+        known_face_encodings.append(user[1])
+
+    # Convert the image from BGR color (which OpenCV uses) to RGB color (which face_recognition uses)
+    rgb_frame = frame[:, :, ::-1]
+
+    # Find all the faces and face encodings in the frame of video
+    face_locations = face_recognition.face_locations(rgb_frame)
+    face_encodings = face_recognition.face_encodings(rgb_frame, face_locations)
+    if not face_locations:
+        return "denied"
+
+    # Loop through each face in this frame of video
+    for (top, right, bottom, left), face_encoding in zip(face_locations, face_encodings):
+        # See if the face is a match for the known face(s)
+        matches = face_recognition.compare_faces(known_face_encodings, face_encoding)
+        # Find best match for the known face(s)
+        face_distances = face_recognition.face_distance(known_face_encodings, face_encoding)
+        best_match_index = np.argmin(face_distances)
+        if matches[best_match_index]:
+            return known_face_names[best_match_index]
+        else:
+            return "denied"
+
+
+def compare(vs, pool, users, times=3):
     """
-    Uses facial recognition to identify pre-learned faces.
-    TODO: Multiprocessing to speed up login (possible 4x improvement)
-    :param times: int, How many frames to recognize
-    :param users: 2 lists in list, User names and face codings
+
     :param vs: Camera object
-    :return: str, users name or denied
+    :param pool: workerpool
+    :param users: Users faces and names
+    :param times: Optional how many recognitions
+    :return: name
     """
-    # set variables
     known_face_encodings = []
     known_face_names = []
+    data = []
     x = 0
-
     try:
         # get names and faces from database to dict
         # pickle converts bytes data back to n-dimensional array
@@ -122,46 +152,22 @@ def compare(times, users, vs):
             known_face_encodings.append(pickle.loads(pickled_face))
             known_face_names.append(users[x][1])
             x += 1
+        known_faces = [list(x) for x in zip(known_face_names, known_face_encodings)]
+        for x in range(times):
+            data.append([vs.read(), known_faces])
+            time.sleep(0.05)
+        print("data done")
 
+        print("workers done")
+        result = pool.map(recognize, data)
+        # return most common name in recognized frames
+        occurrence_count = Counter(result)
+        name = occurrence_count.most_common(1)[0][0]
+        print("done")
+        return name
     except Exception as error:
-        print(f"The error '{error}' occurred in facecam.py compare() parse users")
-
-    # Initialize default #0 camera
-    names = []
-    for i in range(times):
-        # Grab a single frame of video
-        frame = vs.read()
-
-        # Convert the image from BGR color (which OpenCV uses) to RGB color (which face_recognition uses)
-        rgb_frame = frame[:, :, ::-1]
-
-        # Find all the faces and face encodings in the frame of video
-        face_locations = face_recognition.face_locations(rgb_frame)
-        face_encodings = face_recognition.face_encodings(rgb_frame, face_locations)
-        if not face_locations:
-            names.append("denied")
-
-        # Loop through each face in this frame of video
-        for (top, right, bottom, left), face_encoding in zip(face_locations, face_encodings):
-            # See if the face is a match for the known face(s)
-            matches = face_recognition.compare_faces(known_face_encodings, face_encoding)
-            # Find best match for the known face(s)
-            face_distances = face_recognition.face_distance(known_face_encodings, face_encoding)
-            best_match_index = np.argmin(face_distances)
-            if matches[best_match_index]:
-                names.append(known_face_names[best_match_index])
-            else:
-                names.append("denied")
-
-    # Release handle to the webcam
-    # video_capture.release()
-
-    # Return most common recognizes name in names
-    occurrence_count = Counter(names)
-    name = occurrence_count.most_common(1)[0][0]
-
-    # return most common name in recognized frames
-    return name
+        print(f"The error '{error}' occurred in facecam.py prepper() parse users")
+        return error
 
 
 # Captures photo and saves it to faces
