@@ -5,6 +5,7 @@ from databaseinterface import DatabaseInterface
 from databasequeries import DatabaseQueries as Dbq
 import multiprocessing as mp
 import json
+import time
 
 
 app = Flask(__name__, static_url_path='/static')
@@ -79,16 +80,20 @@ def login():
     :return: Redirect to protected page that was requested if login valid.
     """
     # get list of users
+    aika = time.time()
     result = dbi.read_query(Dbq.USERS_NAMES)
     users = [i[0] for i in result]
     faces = dbi.read_query(Dbq.USERS_FACES)
+
     name = compare(vs, pool, faces, 3)
     if name in users:
         next_page = request.args.get('next')
         user = User(name)
         login_user(user)
+        print(f"--- Total login time {time.time() - aika} seconds ---")
         return redirect(next_page)
     else:
+        print(time.time() - aika)
         return redirect(url_for('index'))
 
 
