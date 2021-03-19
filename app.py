@@ -3,6 +3,7 @@ from flask_login import LoginManager, UserMixin, login_required, login_user, log
 from facecam import compare, capture, learn, feed, CameraStream
 from databaseinterface import DatabaseInterface
 from databasequeries import DatabaseQueries as Dbq
+import multiprocessing as mp
 import json
 
 
@@ -14,6 +15,7 @@ app.secret_key = 'penis'
 
 vs = CameraStream(src=0).start()
 dbi = DatabaseInterface("test1", "mikko", "baari", "127.0.0.1")
+pool = mp.Pool(mp.cpu_count()-1)
 
 
 class User(UserMixin):
@@ -80,7 +82,7 @@ def login():
     result = dbi.read_query(Dbq.USERS_NAMES)
     users = [i[0] for i in result]
     faces = dbi.read_query(Dbq.USERS_FACES)
-    name = compare(3, faces, vs)
+    name = compare(vs, pool, faces, 3)
     if name in users:
         next_page = request.args.get('next')
         user = User(name)
