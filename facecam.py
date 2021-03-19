@@ -13,6 +13,7 @@ import hashlib
 import pandas as pd
 from collections import Counter
 import time
+import os
 
 
 lock = threading.Lock()
@@ -100,9 +101,15 @@ def feed(vs):
         time.sleep(0.030)
 
 
-def recognize(food):
-    frame = food[0]
-    known_faces = food[1]
+def recognize(pack):
+    """
+    Unpacks pack and tries to find face from frame provided and returns face recognition result.
+    :param pack: List processed by compare()
+    :return: str name or denied
+    """
+    # parse data
+    frame = pack[0]
+    known_faces = pack[1]
     known_face_names = []
     known_face_encodings = []
     for user in known_faces:
@@ -111,11 +118,12 @@ def recognize(food):
 
     # Convert the image from BGR color (which OpenCV uses) to RGB color (which face_recognition uses)
     rgb_frame = frame[:, :, ::-1]
-
+    compare_time = time.time()
     # Find all the faces and face encodings in the frame of video
     face_locations = face_recognition.face_locations(rgb_frame)
     face_encodings = face_recognition.face_encodings(rgb_frame, face_locations)
     if not face_locations:
+        print(f"--- {os.getpid()} process took {time.time() - compare_time} seconds ---")
         return "denied"
 
     # Loop through each face in this frame of video
@@ -125,6 +133,7 @@ def recognize(food):
         # Find best match for the known face(s)
         face_distances = face_recognition.face_distance(known_face_encodings, face_encoding)
         best_match_index = np.argmin(face_distances)
+        print(f"--- {os.getpid()} process took {time.time() - compare_time} seconds ---")
         if matches[best_match_index]:
             return known_face_names[best_match_index]
         else:
@@ -133,13 +142,15 @@ def recognize(food):
 
 def compare(vs, pool, users, times=3):
     """
-
-    :param vs: Camera object
-    :param pool: workerpool
-    :param users: Users faces and names
-    :param times: Optional how many recognitions
-    :return: name
+    Processes data for workers and performs recognition first-in-first-out.
+    Counts most common result from workers and returns it.
+    :param vs: cv2 camera object
+    :param pool: multiprocessing worker pool
+    :param users: Users face_encodings and names
+    :param times: Optional how many recognitions, def 3
+    :return: str name or denied
     """
+    
     known_face_encodings = []
     known_face_names = []
     data = []
@@ -152,19 +163,20 @@ def compare(vs, pool, users, times=3):
             known_face_encodings.append(pickle.loads(pickled_face))
             known_face_names.append(users[x][1])
             x += 1
+
+        # pack data for workers
         known_faces = [list(x) for x in zip(known_face_names, known_face_encodings)]
         for x in range(times):
             data.append([vs.read(), known_faces])
             time.sleep(0.05)
-        print("data done")
 
-        print("workers done")
+        # pass work to workers
         result = pool.map(recognize, data)
         # return most common name in recognized frames
         occurrence_count = Counter(result)
         name = occurrence_count.most_common(1)[0][0]
-        print("done")
         return name
+
     except Exception as error:
         print(f"The error '{error}' occurred in facecam.py prepper() parse users")
         return error
