@@ -4,8 +4,10 @@ from facecam import compare, capture, learn, feed, CameraStream
 from databaseinterface import DatabaseInterface
 from databasequeries import DatabaseQueries as Dbq
 import multiprocessing as mp
+from motor_control import PumpConf
 import json
 import time
+
 
 
 app = Flask(__name__, static_url_path='/static')
@@ -17,7 +19,7 @@ app.secret_key = 'penis'
 vs = CameraStream(src=0).start()
 dbi = DatabaseInterface("test1", "mikko", "baari", "127.0.0.1")
 pool = mp.Pool(mp.cpu_count()-1)
-
+pump_conf = PumpConf()
 
 class User(UserMixin):
     def __init__(self, username):
@@ -129,8 +131,10 @@ def mix_drink():
     :return: JSON recipe of drink from post
     """
     drink = request.form.get('drink')
-    drink_recipe = json.dumps(dbi.read_query(Dbq.AVAILABLE_RECIPE, drink))
-    time = 60
+    drink_recipe = json.load(dbi.read_query(Dbq.AVAILABLE_RECIPE, drink))
+    print(drink_recipe)
+    pump_conf.make_drink(drink_recipe)
+    time = 10
     return render_template('pumping.html', drink=drink, time=time, drink_recipe=drink_recipe)
 
 
