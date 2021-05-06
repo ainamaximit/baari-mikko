@@ -16,9 +16,10 @@ login_manager.init_app(app)
 login_manager.login_view = "login"
 app.secret_key = 'penis'
 
-vs = CameraStream(src=0).start()
+vs = CameraStream(0).start()
 dbi = DatabaseInterface("test1", "mikko", "baari", "127.0.0.1")
-pool = mp.Pool(mp.cpu_count()-1)
+#pool = mp.Pool(mp.cpu_count()-1)
+pool = mp.Pool(1)
 pump_conf = PumpConf()
 
 class User(UserMixin):
