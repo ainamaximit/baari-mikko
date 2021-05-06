@@ -29,11 +29,9 @@ class CameraStream:
         # print('width: {0} height: {1}'.format(self.stream.get(3), self.stream.get(4)))
         # self.stream.set(3, 320)
         # self.stream.set(4, 240)
-        print('before read')
         (self.grabbed, self.frame) = self.stream.read()
-        print('after read')
         self.stopped = False
-        self.fps = 0.5
+        self.fps = 0.035
         self.int = 1
         self.lock = False
 
@@ -52,16 +50,13 @@ class CameraStream:
         Reads frames from camera endlessly until stopped and stores latest to self.frame
         :return: None
         """
-        print('starting update loop')
         while self.stopped is False:
-            print('update loop start')
             lock.acquire()
             try:
                 (self.grabbed, self.frame) = self.stream.read()
             finally:
                 lock.release()
 
-            print('update loop read')
             time.sleep(self.fps)  # Sleep to reduce cycle speed (fps)
 
     def read(self):
@@ -111,8 +106,6 @@ def feed(vs):
         if frame is None:
             print('No frame :(')
             return
-
-        print(frame)
 
         asd, jpeg = cv2.imencode('.jpg', frame)
         frame = jpeg.tobytes()
