@@ -18,8 +18,7 @@ app.secret_key = 'penis'
 
 vs = CameraStream(0).start()
 dbi = DatabaseInterface("test1", "mikko", "baari", "127.0.0.1")
-#pool = mp.Pool(mp.cpu_count()-1)
-pool = mp.Pool(1)
+pool = mp.Pool(mp.cpu_count()-1)
 #pump_conf = PumpConf()
 
 class User(UserMixin):
