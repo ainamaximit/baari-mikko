@@ -26,10 +26,16 @@ class CameraStream:
         :param src: int, Camera in cv2 default is 0
         """
         self.stream = cv2.VideoCapture(src)
+        # print('width: {0} height: {1}'.format(self.stream.get(3), self.stream.get(4)))
+        # self.stream.set(3, 320)
+        # self.stream.set(4, 240)
+        print('before read')
         (self.grabbed, self.frame) = self.stream.read()
+        print('after read')
         self.stopped = False
-        self.fps = 0.03
+        self.fps = 0.5
         self.int = 1
+        self.lock = False
 
     def start(self):
         """
@@ -46,10 +52,16 @@ class CameraStream:
         Reads frames from camera endlessly until stopped and stores latest to self.frame
         :return: None
         """
-        while True:
-            if self.stopped:
-                return
-            (self.grabbed, self.frame) = self.stream.read()
+        print('starting update loop')
+        while self.stopped is False:
+            print('update loop start')
+            lock.acquire()
+            try:
+                (self.grabbed, self.frame) = self.stream.read()
+            finally:
+                lock.release()
+
+            print('update loop read')
             time.sleep(self.fps)  # Sleep to reduce cycle speed (fps)
 
     def read(self):
@@ -95,10 +107,17 @@ def feed(vs):
     """
     while True:
         frame = vs.read()
+
+        if frame is None:
+            print('No frame :(')
+            return
+
+        print(frame)
+
         asd, jpeg = cv2.imencode('.jpg', frame)
         frame = jpeg.tobytes()
         yield b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n'
-        time.sleep(0.030)
+        time.sleep(vs.fps)
 
 
 def recognize(pack):
