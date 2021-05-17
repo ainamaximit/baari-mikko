@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+
+{% block top %}
+
+    <div style="order: 1;" onclick="window.location='{{ url_for('index') }}';" class="top_small button green2">
+        <img src="/static/left-arrow.png" alt="TAKAISIN">
+    </div>
+
+    <div style="order: 2;" class="top_big button green2">
+        {{ name }}
+    </div>
+
+    <div style="order: 5;" onclick="window.location='{{ url_for('logout') }}';" class="top_small button green2">
+        <img src="/static/close.png" alt="KIRJAUDU ULOS">
+    </div>
+
+{% endblock %}
+
+{% block body %}
+
+    Historia
+
+{% endblock %}

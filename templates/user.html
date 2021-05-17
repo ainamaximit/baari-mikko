@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+
+{% block top %}
+
+    <div style="order: 1;" onclick="window.location='{{ url_for('index') }}';" class="top_small button blue2">
+        <img src="/static/w-arrow.png" alt="TAKAISIN">
+    </div>
+
+    <div style="order: 2;" class="top_big button blue2">
+        {{ name }}
+    </div>
+
+    <div style="order: 5;" onclick="window.location='{{ url_for('logout') }}';" class="top_small button blue2">
+        <img src="/static/w-logout.png" alt="KIRJAUDU ULOS">
+    </div>
+
+{% endblock %}
+
+{% block body %}
+    <div class="user_info">
+        <img src="/faces/{{ img }}" alt="{{ name }}" class="user_img">
+        {% if isadmin %}
+            <h3>Järjestelmävalvojan oikeudet.</h3>
+        {% else %}
+            <h3>Perus dokaaja.</h3>
+        {% endif %}
+    </div>
+
+{% endblock %}
