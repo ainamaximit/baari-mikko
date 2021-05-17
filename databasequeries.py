@@ -73,6 +73,11 @@ class DatabaseQueries:
             SELECT id, name, img FROM users
             """
 
+    USER_IMG = """
+            SELECT img FROM users
+            WHERE name=%s
+            """
+
     DELETE_USER = """
             DELETE FROM users
             WHERE id=%s
