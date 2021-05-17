@@ -17,6 +17,7 @@ import os
 
 
 lock = threading.Lock()
+fps = 30
 
 
 class CameraStream:
@@ -26,14 +27,13 @@ class CameraStream:
         :param src: int, Camera in cv2 default is 0
         """
         self.stream = cv2.VideoCapture(src)
-        # print('width: {0} height: {1}'.format(self.stream.get(3), self.stream.get(4)))
-        # self.stream.set(3, 320)
-        # self.stream.set(4, 240)
+        self.stream.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+        self.stream.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+        self.stream.set(cv2.CAP_PROP_FPS, fps)
         (self.grabbed, self.frame) = self.stream.read()
         self.stopped = False
-        self.fps = 0.035
+        self.fps = 1/fps
         self.int = 1
-        self.lock = False
 
     def start(self):
         """
@@ -50,13 +50,10 @@ class CameraStream:
         Reads frames from camera endlessly until stopped and stores latest to self.frame
         :return: None
         """
-        while self.stopped is False:
-            lock.acquire()
-            try:
-                (self.grabbed, self.frame) = self.stream.read()
-            finally:
-                lock.release()
-
+        while True:
+            if self.stopped:
+                return
+            (self.grabbed, self.frame) = self.stream.read()
             time.sleep(self.fps)  # Sleep to reduce cycle speed (fps)
 
     def read(self):
@@ -102,15 +99,11 @@ def feed(vs):
     """
     while True:
         frame = vs.read()
-
-        if frame is None:
-            print('No frame :(')
-            return
-
+        frame = cv2.resize(frame, (480, 800))
         asd, jpeg = cv2.imencode('.jpg', frame)
         frame = jpeg.tobytes()
         yield b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n'
-        time.sleep(vs.fps)
+        time.sleep(1/fps)
 
 
 def recognize(pack):
@@ -179,8 +172,10 @@ def compare(vs, pool, users, times=3):
         # pack data for workers
         known_faces = [list(x) for x in zip(known_face_names, known_face_encodings)]
         for x in range(times):
-            data.append([vs.read(), known_faces])
-            time.sleep(0.05)
+            frame = vs.read()
+            frame = cv2.resize(frame, (640,360))
+            data.append([frame, known_faces])
+            time.sleep(1/fps+0.001)
 
         # pass work to workers
         result = pool.map(recognize, data)
