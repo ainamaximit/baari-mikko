@@ -1,13 +1,28 @@
+/*body {*/
+/*    padding: 0;*/
+/*    margin: 0;*/
+/*    height: 100vh;*/
+/*    background-color: black;*/
+/*    flex-direction: column;*/
+/*    display: block;*/
+/*    overflow: hidden;*/
+/*    color: white;*/
+/*    font-family: sans-serif;*/
+/*}*/
+
 body {
-    padding: 0;
-    margin: 0;
-    height: 100vh;
-    background-color: black;
-    flex-direction: column;
+    position: absolute;
     display: block;
     overflow: hidden;
     color: white;
     font-family: sans-serif;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: black;
+    margin: 0;
+    padding: 0;
 }
 
 .container {
@@ -36,15 +51,25 @@ body {
 .button {
     border: none;
     color: white;
-    padding: 15px 32px;
+    padding: 5px 32px;
     text-align: center;
     text-decoration: none;
     display: inline-block;
-    font-size: 18px;
+    font-size: 28px;
+    height: 48px;
+    line-height: 48px;
     margin: 4px 2px;
+    background-repeat: no-repeat;
+    background-size: 42px;
+    background-position: center;
+    border-radius: 10px;
 }
 .button:active {
     background-color: #AA8844;
+}
+
+.icon {
+
 }
 
 .field {
@@ -56,8 +81,14 @@ body {
     margin: 4px 2px;
 }
 
+.opaque {
+    background-color: rgba(9, 45, 71, 0.73);
+    color: white;
+    box-shadow: black 0px 0px 0px;
+    border: solid black 1px;
+}
 .green2 {
-    background-color: #0044AA;
+    background-color: #3C8F00;
 }
 .green {
     background-color: #3C8F00;
@@ -69,7 +100,10 @@ body {
     background-color: #AA8844;
 }
 .blue {
-    background-color: #0044AA;
+    background-color: rgba(0, 200, 227, 0.8);
+}
+.blue2 {
+    background-color: rgba(9, 45, 71, 1);
 }
 
 .top_container {
@@ -86,7 +120,23 @@ body {
     flex-basis: 0;
 }
 
+.user_img {
+    height: 60%;
+}
+.user_info {
+    text-align: center;
+    position: relative;
+    height: 100%;
+    left: 0;
+    right: 0;
+}
+
 .video_container {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
     display: block;
     overflow: hidden;
     padding: 0;

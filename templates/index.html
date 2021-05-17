@@ -2,36 +2,36 @@
 
 {% block top %}
 
-    <div style="order: 1;" onclick="window.location='{{ url_for('drinks') }}';" class="top_small button green2">
-        TILAA
+    <div style="order: 1;" onclick="window.location='{{ url_for('drinks') }}';" class="top_small button opaque">
+        <img src="/static/w-drink.png" alt="TILAA" class="icon">
     </div>
 
     {% if logged %}
 
-        <div style="order: 2;" onclick="window.location='{{ url_for('index') }}';" class="top_small button green2">
-            *HISTORIA*
+        <div style="order: 2;" onclick="window.location='{{ url_for('history') }}';" class="top_small button opaque">
+            <img src="/static/w-hist.png" alt="HISTORIA">
         </div>
 
-        <div style="order: 5;" onclick="window.location='{{ url_for('logout') }}';" class="top_small button green2">
-            KIRJAUDU ULOS
+        <div style="order: 5;" onclick="window.location='{{ url_for('logout') }}';" class="top_small button opaque">
+            <img src="/static/w-logout.png" alt="KIRJAUDU ULOS">
         </div>
 
-        <div style="order: 2;" onclick="window.location='{{ url_for('index') }}';" class="top_big button green2">
+        <div style="order: 2;" onclick="window.location='{{ url_for('user') }}';" class="top_big button opaque">
             {{ name }}
         </div>
 
         {% if admin %}
 
-            <div style="order: 4;" onclick="window.location='{{ url_for('admin') }}';"  class="top_small button green2">
-                YLLÄPITO
+            <div style="order: 4;" onclick="window.location='{{ url_for('admin') }}';"  class="top_small button opaque">
+                <img src="/static/w-settings.png" alt="ADMIN">
             </div>
 
         {% endif %}
 
     {% else %}
 
-        <div style="order: 3;" onclick="window.location='/login?next=index';"  class="top_big button green2">
-            KIRJAUDU
+        <div style="order: 3;" onclick="window.location='/login?next=index';"  class="top_small button opaque">
+            <img alt="KIRJAUDU" src="/static/w-login2.png">
         </div>
 
     {% endif %}
