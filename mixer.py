@@ -1,4 +1,5 @@
 import time
+import RPi.GPIO as GPIO
 from threading import Thread
 
 
@@ -7,15 +8,16 @@ class Mixer:
         self.max_spd = 7.66  # 460 ml/min (7,66 ml/s) needs calibration
         self.min_spd = 0  # 46 ml/min (0,766 ml/s) needs calibration
 
-        self.pins = {1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9}
-        self.freq = 200
+        self.pinLayout = {1: 0, 2: 1, 3: 5, 4: 6, 5: 7, 6: 25, 7: 9, 8: 10, 9: 11}
+        self.pumps = {}
+        self.freq = 100
 
         # Configure pumps
-        # GPIO.setmode(GPIO.BCM)
-        # for key, value in self.pins.items():
-        #     GPIO.setup(value, GPIO.OUT)
-        #     self.pins[key] = GPIO.PWM(value, self.freq)
-        #     self.pins[key].start(0)
+        GPIO.setmode(GPIO.BCM)
+        for key, value in self.pinLayout.items():
+            GPIO.setup(value, GPIO.OUT)
+            self.pumps[key] = GPIO.PWM(value, self.freq)
+            self.pumps[key].start(0)
 
     def mix(self, recipe, min_time):
         """
@@ -28,14 +30,16 @@ class Mixer:
             target = (((value / min_time) - self.min_spd) / (self.max_spd - self.min_spd)) * 100
             print(f"{key}:{target}")
             recipe[key] = target
+
         for key, value in recipe.items():
-            # if recipe[key] == self.pins[key]:
-            # self.pins[key].ChangeDutyCycle(value)
-            print(f"{self.pins[key]} pwm cycle to {value}")
+            self.pumps[key].ChangeDutyCycle(value)
+            print(f"{self.pumps[key]} pwm cycle to {value}")
+
         time.sleep(min_time)
         print("Pausing pumps...")
-        for key, value in self.pins.items():
-            # self.pins[key].ChangeDutyCycle(0)
+
+        for key, value in self.pumps.items():
+            self.pumps[key].ChangeDutyCycle(0)
             print(f"{key} pwm cycle to 0")
 
     def request(self, recipe):
@@ -59,13 +63,13 @@ class Mixer:
 
     def stop(self):
         try:
-            for key, _ in self.pins.items():
-                # self.pins[key].stop()
+            for key, _ in self.pumps.items():
+                self.pumps[key].stop()
                 print(f"Pump {key} stopped.")
         except Exception as e:
             print(f"mixer.py: Error Stopping pumps. {e}")
         finally:
-            # GPIO.cleanup()
+            GPIO.cleanup()
             print("Pin allocation cleaned.")
 
 
