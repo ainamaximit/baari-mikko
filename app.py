@@ -1,13 +1,13 @@
-from flask import Flask, render_template, request, Response, redirect, url_for
+from flask import Flask, render_template, request, Response, redirect, url_for, send_from_directory
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
 from facecam import compare, capture, learn, feed, CameraStream
 from databaseinterface import DatabaseInterface
 from databasequeries import DatabaseQueries as Dbq
 import multiprocessing as mp
-from motor_control import PumpConf
+from mixer import Mixer
+# from motor_control import PumpConf
 import json
 import time
-
 
 
 app = Flask(__name__, static_url_path='/static')
@@ -16,10 +16,12 @@ login_manager.init_app(app)
 login_manager.login_view = "login"
 app.secret_key = 'penis'
 
-vs = CameraStream(0).start()
+vs = CameraStream(src=0).start()
 dbi = DatabaseInterface("test1", "mikko", "baari", "127.0.0.1")
 pool = mp.Pool(mp.cpu_count()-1)
-#pump_conf = PumpConf()
+# pump_conf = PumpConf()
+
+mixer = Mixer()
 
 class User(UserMixin):
     def __init__(self, username):
@@ -28,11 +30,16 @@ class User(UserMixin):
         :param username: Users name in database
         """
         self.id = username
+        self.img = None
         self.admin = False
-        result = dbi.read_query(Dbq.USER_IS_ADMIN, (username,))
-        if result:
-            if result[0][0]:
-                self.admin = result[0][0]
+        isadmin = dbi.read_query(Dbq.USER_IS_ADMIN, (username,))
+        if isadmin:
+            if isadmin[0][0]:
+                self.admin = isadmin[0][0]
+        img_path = dbi.read_query(Dbq.USER_IMG, (username,))
+        if img_path:
+            if img_path[0][0]:
+                self.img = img_path[0][0]
 
     def is_admin(self):
         """
@@ -40,6 +47,9 @@ class User(UserMixin):
         :return: Boolean, is current user admin
         """
         return self.admin
+
+    def get_photo(self):
+        return self.img
 
 
 @app.route("/", methods=["GET"])
@@ -110,6 +120,11 @@ def logout():
     return redirect(url_for('index'))
 
 
+@app.route("/faces/<path:path>")
+def faces_dir(path):
+    return send_from_directory("faces", path)
+
+
 @app.route('/drinks')
 @login_required
 def drinks():
@@ -123,19 +138,46 @@ def drinks():
     return render_template('drinks.html', name=name, drinks=available_drinks)
 
 
+@app.route('/history')
+@login_required
+def history():
+    """
+    Shows drink history
+    :return: History
+    """
+    name = current_user.id
+
+    return render_template('history.html', name=name)
+
+
+@app.route('/user')
+@login_required
+def user():
+    """
+    Shows user info
+    :return: User page
+    """
+    name = current_user.id
+    img = current_user.img
+    isadmin = current_user.admin
+    return render_template('user.html', name=name, img=img, isadmin=isadmin)
+
+
 @app.route('/mix_drink', methods=['GET', 'POST'])
 @login_required
 def mix_drink():
     """
     TODO: Makes drink by activating motor_control.py
-    :return: JSON recipe of drink from post
+    :return: Drink pumping view
     """
     drink = request.form.get('drink')
-    drink_recipe = json.load(dbi.read_query(Dbq.AVAILABLE_RECIPE, drink))
+    print(drink)
+    drink_recipe = dbi.read_query(Dbq.AVAILABLE_RECIPE, (drink,))
     print(drink_recipe)
-    pump_conf.make_drink(drink_recipe)
-    time = 10
-    return render_template('pumping.html', drink=drink, time=time, drink_recipe=drink_recipe)
+    print(dict(drink_recipe))
+    mix_time = mixer.request(dict(drink_recipe))
+    # pump_conf.make_drink(drink_recipe)
+    return render_template('pumping.html', drink=drink, time=mix_time, drink_recipe=drink_recipe)
 
 
 @app.route('/admin')
