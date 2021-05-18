@@ -8,7 +8,7 @@ class Mixer:
         self.max_spd = 7.66  # 460 ml/min (7,66 ml/s) needs calibration
         self.min_spd = 0  # 46 ml/min (0,766 ml/s) needs calibration
 
-        self.pinLayout = {1: 0, 2: 1, 3: 5, 4: 6, 5: 7, 6: 25, 7: 9, 8: 10, 9: 11}
+        self.pinLayout = {1: 1, 2: 26, 3: 19, 4: 6, 5: 7, 6: 25, 7: 9, 8: 10, 9: 11}
         self.pumps = {}
         self.freq = 100
 
@@ -74,7 +74,8 @@ class Mixer:
 
 
 if __name__ == "__main__":
-    recipe = {3: 50, 6: 50, 9: 100}
+    # recipe = {3: 50, 6: 50, 9: 100}
+    recipe = {5: 10}
 
     mixer = Mixer()
     asd = mixer.request(recipe)
