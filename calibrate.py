@@ -39,7 +39,7 @@ def calibrate():
     average = (total/i)+0.000001
 
     print("\n#############################################################")
-    print(f"#         Suggested max_spd for mixer.py {round(average, 2)} ml/s         #")
+    print(f"#         Suggested max_spd for mixer.py {round(average, 2)} ml/s          #")
     print("#############################################################\n")
 
 
