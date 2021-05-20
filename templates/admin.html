@@ -2,16 +2,16 @@
 
 {% block top %}
 
-    <div style="order: 1;" onclick="window.location='{{ url_for('index') }}';" class="top_small button green2">
-        TAKAISIN
+    <div style="order: 1;" onclick="window.location='{{ url_for('index') }}';" class="top_small button blue2">
+        <img src="/static/w-arrow.png" alt="TAKAISIN">
     </div>
 
-    <div style="order: 2;" class="top_big button green2">
-        Ylläpito - {{ name }}
+    <div style="order: 2;" class="top_big button blue2">
+        {{ name }}
     </div>
 
-    <div style="order: 5;" onclick="window.location='{{ url_for('logout') }}';" class="top_small button green2">
-        KIRJAUDU ULOS
+    <div style="order: 5;" onclick="window.location='{{ url_for('logout') }}';" class="top_small button blue2">
+        <img src="/static/w-logout.png" alt="KIRJAUDU ULOS">
     </div>
 
 {% endblock %}
@@ -21,9 +21,6 @@
     <div class="container">
         <div onclick="window.location='{{ url_for('pumps') }}';" class="button item green">
             Pumppujen raaka-aineet
-        </div>
-        <div onclick="window.location='{{ url_for('recipes') }}';" class="button item green">
-            *Muokkaa reseptejä*
         </div>
         <div onclick="window.location='{{ url_for('register') }}';" class="button item green">
             Lisää käyttäjä

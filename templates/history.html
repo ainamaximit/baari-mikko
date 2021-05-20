@@ -18,6 +18,20 @@
 
 {% block body %}
 
-    Historia
+    <div>
+        <table style="font-size: 14px;">
+
+            {% for drink in user_history %}
+
+                <tr>
+                    <td> {{ drink[1].strftime("%d.%m") }} </td>
+                    <td> {{ drink[1].strftime("%H:%M:%S") }} </td>
+                    <td> {{ drink[0] }} </td>
+                </tr>
+
+        {% endfor %}
+
+        </table>
+    </div>
 
 {% endblock %}
