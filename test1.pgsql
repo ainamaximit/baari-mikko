@@ -89,6 +89,42 @@ ALTER SEQUENCE public.ingredients_id_seq OWNED BY public.ingredients.id;
 
 
 --
+-- Name: orders; Type: TABLE; Schema: public; Owner: mikko
+--
+
+CREATE TABLE public.orders (
+    user_id integer NOT NULL,
+    drink_id integer NOT NULL,
+    "timestamp" timestamp without time zone,
+    id integer NOT NULL
+);
+
+
+ALTER TABLE public.orders OWNER TO mikko;
+
+--
+-- Name: orders_id_seq; Type: SEQUENCE; Schema: public; Owner: mikko
+--
+
+CREATE SEQUENCE public.orders_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.orders_id_seq OWNER TO mikko;
+
+--
+-- Name: orders_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: mikko
+--
+
+ALTER SEQUENCE public.orders_id_seq OWNED BY public.orders.id;
+
+
+--
 -- Name: pumps; Type: TABLE; Schema: public; Owner: mikko
 --
 
@@ -210,6 +246,13 @@ ALTER TABLE ONLY public.ingredients ALTER COLUMN id SET DEFAULT nextval('public.
 
 
 --
+-- Name: orders id; Type: DEFAULT; Schema: public; Owner: mikko
+--
+
+ALTER TABLE ONLY public.orders ALTER COLUMN id SET DEFAULT nextval('public.orders_id_seq'::regclass);
+
+
+--
 -- Name: pumps id; Type: DEFAULT; Schema: public; Owner: mikko
 --
 
@@ -240,6 +283,7 @@ COPY public.drinks (id, drink) FROM stdin;
 3	Irish Coffee
 4	Kelkka
 5	Paha
+6	Long Island
 \.
 
 
@@ -258,6 +302,29 @@ COPY public.ingredients (id, ingredient) FROM stdin;
 8	Appelsiinimehu
 9	Vodka
 10	Passoa
+11	Lime mehu
+12	Sitruunamehu
+13	Tequila
+14	Triple sec
+15	Jaloviina
+16	Absintti
+17	Kahvilikööri
+18	Omenamehu
+19	Vermutti
+20	Amaretto
+21	Konjakki
+22	Karpalomehu
+23	Valkoviini
+24	Energiajuoma
+25	Sokeriliemi
+\.
+
+
+--
+-- Data for Name: orders; Type: TABLE DATA; Schema: public; Owner: mikko
+--
+
+COPY public.orders (user_id, drink_id, "timestamp", id) FROM stdin;
 \.
 
 
@@ -266,9 +333,15 @@ COPY public.ingredients (id, ingredient) FROM stdin;
 --
 
 COPY public.pumps (id, ingredient_id) FROM stdin;
-1	1
-2	2
+1	5
+2	4
 3	3
+4	2
+5	12
+6	25
+7	13
+8	14
+9	9
 \.
 
 
@@ -277,24 +350,20 @@ COPY public.pumps (id, ingredient_id) FROM stdin;
 --
 
 COPY public.recipes (drink_id, ingredient_id, quantity, id) FROM stdin;
-1	2	40	2
-2	3	80	3
-2	3	80	4
-2	1	40	5
-3	6	40	6
-3	7	40	7
-3	1	40	8
-4	9	20	9
-4	10	20	10
-4	8	120	11
-5	5	50	12
-5	1	30	13
-5	2	30	14
-5	1	30	15
-5	2	30	16
-1	1	60	17
-1	1	600	18
-1	1	600	1
+1	5	150	2
+2	2	50	3
+2	4	150	4
+4	10	30	5
+4	9	30	6
+4	8	140	7
+6	13	20	8
+6	9	20	9
+6	2	20	10
+6	14	20	11
+6	3	20	12
+6	13	40	13
+6	25	50	14
+6	4	10	15
 \.
 
 
@@ -318,7 +387,14 @@ SELECT pg_catalog.setval('public.drinks_id_seq', 5, true);
 -- Name: ingredients_id_seq; Type: SEQUENCE SET; Schema: public; Owner: mikko
 --
 
-SELECT pg_catalog.setval('public.ingredients_id_seq', 10, true);
+SELECT pg_catalog.setval('public.ingredients_id_seq', 24, true);
+
+
+--
+-- Name: orders_id_seq; Type: SEQUENCE SET; Schema: public; Owner: mikko
+--
+
+SELECT pg_catalog.setval('public.orders_id_seq', 10, true);
 
 
 --
@@ -339,7 +415,7 @@ SELECT pg_catalog.setval('public.recipes_id_seq', 18, true);
 -- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: mikko
 --
 
-SELECT pg_catalog.setval('public.users_id_seq', 46, true);
+SELECT pg_catalog.setval('public.users_id_seq', 55, true);
 
 
 --
@@ -372,6 +448,14 @@ ALTER TABLE ONLY public.ingredients
 
 ALTER TABLE ONLY public.ingredients
     ADD CONSTRAINT ingredients_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: orders orders_pkey; Type: CONSTRAINT; Schema: public; Owner: mikko
+--
+
+ALTER TABLE ONLY public.orders
+    ADD CONSTRAINT orders_pkey PRIMARY KEY (id);
 
 
 --
@@ -427,6 +511,22 @@ ALTER TABLE ONLY public.users
 --
 
 CREATE UNIQUE INDEX recipes_index_id ON public.recipes USING btree (id, drink_id) WHERE (id < 0);
+
+
+--
+-- Name: orders orders_drink_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: mikko
+--
+
+ALTER TABLE ONLY public.orders
+    ADD CONSTRAINT orders_drink_id_fkey FOREIGN KEY (drink_id) REFERENCES public.drinks(id);
+
+
+--
+-- Name: orders orders_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: mikko
+--
+
+ALTER TABLE ONLY public.orders
+    ADD CONSTRAINT orders_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id);
 
 
 --
