@@ -3,10 +3,9 @@ from flask_login import LoginManager, UserMixin, login_required, login_user, log
 from facecam import compare, capture, learn, feed, CameraStream
 from databaseinterface import DatabaseInterface
 from databasequeries import DatabaseQueries as Dbq
-import multiprocessing as mp
 from mixer import Mixer
-# from motor_control import PumpConf
-import json
+from datetime import datetime
+import multiprocessing as mp
 import time
 
 
@@ -19,9 +18,8 @@ app.secret_key = 'penis'
 vs = CameraStream(src=0).start()
 dbi = DatabaseInterface("test1", "mikko", "baari", "127.0.0.1")
 pool = mp.Pool(mp.cpu_count()-1)
-# pump_conf = PumpConf()
-
 mixer = Mixer()
+
 
 class User(UserMixin):
     def __init__(self, username):
@@ -32,14 +30,19 @@ class User(UserMixin):
         self.id = username
         self.img = None
         self.admin = False
-        isadmin = dbi.read_query(Dbq.USER_IS_ADMIN, (username,))
-        if isadmin:
-            if isadmin[0][0]:
-                self.admin = isadmin[0][0]
-        img_path = dbi.read_query(Dbq.USER_IMG, (username,))
-        if img_path:
-            if img_path[0][0]:
-                self.img = img_path[0][0]
+        self.serial = None
+
+        user_info = dbi.read_query(Dbq.GET_USER_INFO, (username,))
+        print(user_info)
+        if user_info:
+            if user_info[0][0]:
+                self.serial = user_info[0][0]
+            if user_info[0][1]:
+                self.id = user_info[0][1]
+            if user_info[0][2]:
+                self.img = user_info[0][2]
+            if user_info[0][3]:
+                self.admin = user_info[0][3]
 
     def is_admin(self):
         """
@@ -62,14 +65,14 @@ def index():
 
     if current_user.is_authenticated:
         logged = current_user.is_authenticated
-        isadmin = current_user.is_admin
+        is_admin = current_user.is_admin
         name = current_user.id
     else:
         logged = False
-        isadmin = False
+        is_admin = False
         name = None
 
-    return render_template('index.html', logged=logged, name=name, admin=isadmin)
+    return render_template('index.html', logged=logged, name=name, admin=is_admin)
 
 
 @login_manager.user_loader
@@ -79,9 +82,7 @@ def load_user(name):
     :param name: User string (name)
     :return: User object from user class
     """
-    user = User(name)
-
-    return user
+    return User(name)
 
 
 @app.route('/login')
@@ -100,8 +101,8 @@ def login():
     name = compare(vs, pool, faces, 3)
     if name in users:
         next_page = request.args.get('next')
-        user = User(name)
-        login_user(user)
+        user_name = User(name)
+        login_user(user_name)
         print(f"--- Total login time {time.time() - aika} seconds ---")
         return redirect(next_page)
     else:
@@ -122,6 +123,11 @@ def logout():
 
 @app.route("/faces/<path:path>")
 def faces_dir(path):
+    """
+    Serves user image folder
+    :param path: User img folder
+    :return: User img
+    """
     return send_from_directory("faces", path)
 
 
@@ -146,8 +152,9 @@ def history():
     :return: History
     """
     name = current_user.id
-
-    return render_template('history.html', name=name)
+    user_history = dbi.read_query(Dbq.USER_HISTORY, (current_user.id,))
+    # date = user_history[1][3].strftime("%d.%m - %H:%M:%S"))
+    return render_template('history.html', name=name, user_history=user_history)
 
 
 @app.route('/user')
@@ -159,24 +166,28 @@ def user():
     """
     name = current_user.id
     img = current_user.img
-    isadmin = current_user.admin
-    return render_template('user.html', name=name, img=img, isadmin=isadmin)
+    is_admin = current_user.admin
+    return render_template('user.html', name=name, img=img, isadmin=is_admin)
 
 
 @app.route('/mix_drink', methods=['GET', 'POST'])
 @login_required
 def mix_drink():
     """
-    TODO: Makes drink by activating motor_control.py
-    :return: Drink pumping view
+    Makes drink by activating mixer.py
+    :return: Mixing view
     """
     drink = request.form.get('drink')
+    dt = datetime.now()
+
     print(drink)
-    drink_recipe = dbi.read_query(Dbq.AVAILABLE_RECIPE, (drink,))
+    drink_id = dbi.read_query(Dbq.GET_DRINK_ID, (drink, ))  # get drink id for order history
+    dbi.execute_query(Dbq.ORDER, (current_user.serial, drink_id[0], dt))  # write to order history
+
+    drink_recipe = dbi.read_query(Dbq.AVAILABLE_RECIPE, (drink, ))
     print(drink_recipe)
     print(dict(drink_recipe))
     mix_time = mixer.request(dict(drink_recipe))
-    # pump_conf.make_drink(drink_recipe)
     return render_template('pumping.html', drink=drink, time=mix_time, drink_recipe=drink_recipe)
 
 
@@ -185,7 +196,7 @@ def mix_drink():
 def admin():
     """
     Administrator view.
-    Has links to create user, change recipes, etc.
+    Has links to register user, delete user and configure pumps.
     :return: Admin view
     """
     name = current_user.id
@@ -244,8 +255,8 @@ def del_user():
     :return: delete user view
     """
     if request.method == 'POST':
-        usertodel = request.form.get('usertodel')
-        dbi.execute_query(Dbq.DELETE_USER, (usertodel,))
+        user_to_del = request.form.get('usertodel')
+        dbi.execute_query(Dbq.DELETE_USER, (user_to_del,))
     all_users = dbi.read_query(Dbq.USERS)
     return render_template('delete.html', all_users=all_users)
 
@@ -279,10 +290,10 @@ def pumps():
                 print(f'Set {x} for pump {i}')
                 dbi.execute_query(Dbq.SET_PUMP_INGREDIENTS, (i, x))
 
-        atpumps = dbi.read_query(Dbq.GET_PUMPS_INGREDIENTS)
+        at_pumps = dbi.read_query(Dbq.GET_PUMPS_INGREDIENTS)
         ingredients = dbi.read_query(Dbq.ALL_INGREDIENTS)
 
-        return render_template('pumps.html', atpumps=atpumps, ingredients=ingredients)
+        return render_template('pumps.html', atpumps=at_pumps, ingredients=ingredients)
     else:
         return redirect(url_for('index'))
 
@@ -291,7 +302,6 @@ def pumps():
 def live_feed():
     """
     Img stream from camera. Use this as img source in html or css.
-    :return: image
+    :return: motion jpeg
     """
-    # Return camera frames as jpg
     return Response(feed(vs), mimetype='multipart/x-mixed-replace; boundary=frame')
