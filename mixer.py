@@ -61,6 +61,28 @@ class Mixer:
             t.start()
             return min_time
 
+    def prime(self, prime_qty=50):
+        prime_pumps = {1: prime_qty,
+                       2: prime_qty,
+                       3: prime_qty,
+                       4: prime_qty,
+                       5: prime_qty,
+                       6: prime_qty,
+                       7: prime_qty,
+                       8: prime_qty,
+                       9: prime_qty}
+        try:
+            most_qty = recipe[max(prime_pumps, key=recipe.get)]
+            min_time = most_qty / self.max_spd
+
+            print("Priming system...")
+
+            t = Thread(target=self.mix, args=(prime_pumps, min_time))
+            t.start()
+            return min_time
+        except Exception as e:
+            print(f"mixer.py: Error in priming. {e}")
+
     def stop(self):
         try:
             for key, _ in self.pumps.items():
@@ -74,9 +96,14 @@ class Mixer:
 
 
 if __name__ == "__main__":
-    # recipe = {3: 50, 6: 50, 9: 100}
-    recipe = {5: 10}
 
     mixer = Mixer()
-    asd = mixer.request(recipe)
-    print(asd)
+
+    c = input("Prime pumps? (y/n)")
+    if c == "n":
+        quit()
+    else:
+        prime_time = mixer.prime()
+        print(f"\nPriming takes {round(prime_time, 2)} seconds.")
+        time.sleep(prime_time)
+        print("\nDone, first drinks might be bit lame tho.")
