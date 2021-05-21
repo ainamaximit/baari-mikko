@@ -14,10 +14,12 @@ import pandas as pd
 from collections import Counter
 import time
 import os
+import configparser
 
+config = configparser.ConfigParser()
+config.read('config.ini')
 
 lock = threading.Lock()
-fps = 30
 
 
 class CameraStream:
@@ -27,12 +29,12 @@ class CameraStream:
         :param src: int, Camera in cv2 default is 0
         """
         self.stream = cv2.VideoCapture(src)
-        self.stream.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
-        self.stream.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
-        self.stream.set(cv2.CAP_PROP_FPS, fps)
+        self.stream.set(cv2.CAP_PROP_FRAME_WIDTH, config.getint("FACECAM", "camera_width"))
+        self.stream.set(cv2.CAP_PROP_FRAME_HEIGHT, config.getint("FACECAM", "camera_height"))
+        self.stream.set(cv2.CAP_PROP_FPS, config.getint("FACECAM", "camera_fps"))
         (self.grabbed, self.frame) = self.stream.read()
         self.stopped = False
-        self.fps = 1/fps
+        self.fps = 1/config.getint("FACECAM", "camera_fps")
         self.int = 1
 
     def start(self):
@@ -99,11 +101,13 @@ def feed(vs):
     """
     while True:
         frame = vs.read()
-        frame = cv2.resize(frame, (480, 800))
+        frame = cv2.resize(frame,
+                           (config.getint("FACECAM", "stream_height"),
+                            config.getint("FACECAM", "stream_width")))
         asd, jpeg = cv2.imencode('.jpg', frame)
         frame = jpeg.tobytes()
         yield b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n'
-        time.sleep(1/fps)
+        time.sleep(1/config.getint("FACECAM", "camera_fps"))
 
 
 def recognize(pack):
@@ -173,9 +177,9 @@ def compare(vs, pool, users, times=3):
         known_faces = [list(x) for x in zip(known_face_names, known_face_encodings)]
         for x in range(times):
             frame = vs.read()
-            frame = cv2.resize(frame, (640,360))
+            frame = cv2.resize(frame, (round(config.getint('FACECAM', 'camera_width')/config.getint('FACECAM', 'recognition_crop')), round(config.getint('FACECAM', 'camera_height')/config.getint('FACECAM', 'recognition_crop'))))
             data.append([frame, known_faces])
-            time.sleep(1/fps+0.001)
+            time.sleep(1/config.getint('FACECAM', 'camera_fps')+0.001)
 
         # pass work to workers
         result = pool.map(recognize, data)
@@ -185,7 +189,7 @@ def compare(vs, pool, users, times=3):
         return name
 
     except Exception as error:
-        print(f"The error '{error}' occurred in facecam.py prepper() parse users")
+        print(f"The error '{error}' occurred in facecam.py compare() parse users")
         return error
 
 
@@ -214,7 +218,7 @@ def get_camera_resolutions():
     table = pd.read_html(url)[0]
     table.columns = table.columns.droplevel()
 
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(config.getint('FACECAM', 'camera_source'))
     resolutions = {}
 
     for index, row in table[["W", "H"]].iterrows():
@@ -233,10 +237,13 @@ if __name__ == '__main__':
     """
     from databaseinterface import DatabaseInterface
     from databasequeries import DatabaseQueries as Dbq
-    dbi = DatabaseInterface("test1", "mikko", "baari", "127.0.0.1")
-    username = 'root'
-    img_path = 'root.jpg'
-    print('Create root user from faces/root.jpg')
+    dbi = DatabaseInterface(config.get('DATABASE', 'database'),
+                            config.get('DATABASE', 'username'),
+                            config.get('DATABASE', 'password'),
+                            config.get('DATABASE', 'ip_address'))
+    username = config.get('BAARIMIKKO', 'root_name')
+    img_path = config.get('BAARIMIKKO', 'root_photo')
+    print(f'Create {username} user from faces/{img_path}')
     ask = input('Y/N?')
     if ask in ('Y', 'y', 'yes', 'Yes', 'YES'):
         try:
@@ -244,7 +251,7 @@ if __name__ == '__main__':
             args = (username, pickled, img_path, True)
             dbi.execute_query(Dbq.CREATE_USER, args)
         except Exception as e:
-            print(f"Error {e} while creating root user. Did you provide faces/root.jpg and is database set correctly?")
+            print(f"Error {e} while creating {username} user. Did you provide faces/{img_path} and is database set correctly?")
     else:
         print('Cancelled by user')
         exit(0)

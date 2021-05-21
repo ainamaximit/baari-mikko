@@ -1,16 +1,23 @@
 import time
 import RPi.GPIO as GPIO
 from threading import Thread
+import configparser
+
+config = configparser.ConfigParser()
+config.read('config.ini')
 
 
 class Mixer:
     def __init__(self):
-        self.max_spd = 7.66  # 460 ml/min (7,66 ml/s) needs calibration
-        self.min_spd = 0  # 46 ml/min (0,766 ml/s) needs calibration
+        self.max_spd = config.getint('MIXER', 'max_flow')  # 460 ml/min (7,66 ml/s) needs calibration
+        self.min_spd = config.getint('MIXER', 'min_flow')  # 46 ml/min (0,766 ml/s) needs calibration
 
-        self.pinLayout = {1: 1, 2: 26, 3: 19, 4: 6, 5: 7, 6: 25, 7: 9, 8: 10, 9: 11}
+        self.raw_pin_layout = dict(config['PIN_LAYOUT'])
+        self.pinLayout = dict((k, int(v)) for k, v in self.raw_pin_layout.items())
+
+        # self.pinLayout = {1: 1, 2: 26, 3: 19, 4: 6, 5: 7, 6: 25, 7: 9, 8: 10, 9: 11}
         self.pumps = {}
-        self.freq = 100
+        self.freq = config.getint('MIXER', 'pwm_freq')
 
         # Configure pumps
         GPIO.setmode(GPIO.BCM)
@@ -61,7 +68,7 @@ class Mixer:
             t.start()
             return min_time
 
-    def prime(self, prime_qty=50):
+    def prime(self, prime_qty=config.getint('MIXER', 'priming_quantity')):
         prime_pumps = {1: prime_qty,
                        2: prime_qty,
                        3: prime_qty,
@@ -72,7 +79,7 @@ class Mixer:
                        8: prime_qty,
                        9: prime_qty}
         try:
-            most_qty = recipe[max(prime_pumps, key=recipe.get)]
+            most_qty = prime_pumps[max(prime_pumps, key=prime_pumps.get)]
             min_time = most_qty / self.max_spd
 
             print("Priming system...")
