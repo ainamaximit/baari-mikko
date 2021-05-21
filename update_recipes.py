@@ -1,9 +1,19 @@
 import psycopg2
-conn = psycopg2.connect("host=localhost dbname=test1 user=mikko password=baari")
+import configparser
+
+config = configparser.ConfigParser()
+config.read('config.ini')
+
+conn = psycopg2.connect(
+                database=config.get('DATABASE', 'database'),
+                user=config.get('DATABASE', 'username'),
+                password=config.get('DATABASE', 'password'),
+                host=config.get('DATABASE', 'ip_address'),
+            )
 cur = conn.cursor()
-with open('recipes.csv', 'r') as f:
-    # Notice that we don't need the `csv` module.
-    next(f) # Skip the header row.
+with open(config.get('BAARIMIKKO', 'recipes'), 'r') as f:
+
+    next(f)  # Skip the header row.
     cur.copy_from(f, 'recipes', sep=',')
 
 conn.commit()
