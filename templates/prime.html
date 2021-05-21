@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+
+{% block top %}
+
+    <div style="order: 1;" onclick="window.location='{{ url_for('admin') }}';" class="top_small button blue2">
+        <img src="/static/w-arrow.png" alt="TAKAISIN">
+    </div>
+
+    <div style="order: 2;" class="top_big button blue2">
+        Linjojen esitäyttö
+    </div>
+
+    <div style="order: 5;" onclick="window.location='{{ url_for('logout') }}';" class="top_small button blue2">
+        <img src="/static/w-logout.png" alt="KIRJAUDU ULOS">
+    </div>
+
+{% endblock %}
+
+{% block body %}
+
+    <form action="{{ url_for('prime') }}" method="post" class="container">
+        <input class="item button blue" onclick="document.getElementById('prime').stepUp(5);" type="button" name="" value="+">
+        <input type="number" class="item field" id="prime" name="prime" value="{{ prime_qty }}">
+        <input class="item button blue" onclick="document.getElementById('prime').stepDown(5);" type="button" name="" value="-">
+        <button class="button green item" type="submit">PUMPPAA</button>
+    </form>
+
+    <p>HUOM! Voit toistaa tämän useita kertoja, joten suositeltavaa on valita määrä 5-20 väliltä,
+        jolloin yhdellä kerralla 200ml lasi ei tule vielä täyteen.</p>
+    <p>Odota aina, että pumput ovat pysähtyneet ennen seuraavaa pumppausta.</p>
+
+{% endblock %}
