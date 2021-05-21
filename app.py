@@ -3,22 +3,30 @@ from flask_login import LoginManager, UserMixin, login_required, login_user, log
 from facecam import compare, capture, learn, feed, CameraStream
 from databaseinterface import DatabaseInterface
 from databasequeries import DatabaseQueries as Dbq
-from mixer import Mixer
+# from mixer import Mixer
 from datetime import datetime
 import multiprocessing as mp
 import time
+import configparser
+
+config = configparser.ConfigParser()
+config.read('config.ini')
+
 
 
 app = Flask(__name__, static_url_path='/static')
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
-app.secret_key = 'penis'
+app.secret_key = config.get('BAARIMIKKO', 'secret_key')
 
-vs = CameraStream(src=0).start()
-dbi = DatabaseInterface("test1", "mikko", "baari", "127.0.0.1")
+vs = CameraStream(config.getint('FACECAM', 'camera_source')).start()
+dbi = DatabaseInterface(config.get('DATABASE', 'database'),
+                        config.get('DATABASE', 'username'),
+                        config.get('DATABASE', 'password'),
+                        config.get('DATABASE', 'ip_address'))
 pool = mp.Pool(mp.cpu_count()-1)
-mixer = Mixer()
+# mixer = Mixer()
 
 
 class User(UserMixin):
@@ -98,7 +106,7 @@ def login():
     users = [i[0] for i in result]
     faces = dbi.read_query(Dbq.USERS_FACES)
 
-    name = compare(vs, pool, faces, 3)
+    name = compare(vs, pool, faces, config.getint('FACECAM', 'recognize_frames'))
     if name in users:
         next_page = request.args.get('next')
         user_name = User(name)
@@ -187,7 +195,8 @@ def mix_drink():
     drink_recipe = dbi.read_query(Dbq.AVAILABLE_RECIPE, (drink, ))
     print(drink_recipe)
     print(dict(drink_recipe))
-    mix_time = mixer.request(dict(drink_recipe))
+    mix_time = 5
+    # mix_time = mixer.request(dict(drink_recipe))
     return render_template('pumping.html', drink=drink, time=mix_time, drink_recipe=drink_recipe)
 
 
@@ -259,6 +268,25 @@ def del_user():
         dbi.execute_query(Dbq.DELETE_USER, (user_to_del,))
     all_users = dbi.read_query(Dbq.USERS)
     return render_template('delete.html', all_users=all_users)
+
+
+@app.route('/prime', methods=['POST', 'GET'])
+@login_required
+def prime():
+    """
+    Prime the lines
+    :return: delete user view
+    """
+    prime_qty = config.getint('MIXER', 'priming_quantity')
+    if request.method == 'POST':
+        qty = int(request.form.get('prime'))
+        if qty < 3:
+            print("funny")
+        else:
+            print(f"Priming {qty} ml")
+            # mixer.prime(qty)
+    all_users = dbi.read_query(Dbq.USERS)
+    return render_template('prime.html', all_users=all_users, prime_qty=prime_qty)
 
 
 @app.route('/recipes', methods=['GET', 'POST'])
