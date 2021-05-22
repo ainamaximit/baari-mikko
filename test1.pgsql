@@ -284,6 +284,15 @@ COPY public.drinks (id, drink) FROM stdin;
 4	Kelkka
 5	Paha
 6	Long Island
+7	Juoma 1
+8	Tom Collins
+9	Viski Souri
+10	Triplesec Unelma
+11	Lasten aspiriini
+12	Kamikatse
+13	Dakiiri
+14	Vikimehu
+15	Metropolitan
 \.
 
 
@@ -317,6 +326,9 @@ COPY public.ingredients (id, ingredient) FROM stdin;
 23	Valkoviini
 24	Energiajuoma
 25	Sokeriliemi
+26	asdasdasd
+27	Vichy
+28	Seljankukka
 \.
 
 
@@ -350,6 +362,7 @@ COPY public.pumps (id, ingredient_id) FROM stdin;
 --
 
 COPY public.recipes (drink_id, ingredient_id, quantity, id) FROM stdin;
+1	3	50	1
 1	5	150	2
 2	2	50	3
 2	4	150	4
