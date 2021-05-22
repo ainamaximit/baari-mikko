@@ -3,7 +3,7 @@ from flask_login import LoginManager, UserMixin, login_required, login_user, log
 from facecam import compare, capture, learn, feed, CameraStream
 from databaseinterface import DatabaseInterface
 from databasequeries import DatabaseQueries as Dbq
-# from mixer import Mixer
+from mixer import Mixer
 from datetime import datetime
 import multiprocessing as mp
 import time
@@ -26,7 +26,7 @@ dbi = DatabaseInterface(config.get('DATABASE', 'database'),
                         config.get('DATABASE', 'password'),
                         config.get('DATABASE', 'ip_address'))
 pool = mp.Pool(mp.cpu_count()-1)
-# mixer = Mixer()
+mixer = Mixer()
 
 
 class User(UserMixin):
@@ -196,7 +196,7 @@ def mix_drink():
     print(drink_recipe)
     print(dict(drink_recipe))
     mix_time = 5
-    # mix_time = mixer.request(dict(drink_recipe))
+    mix_time = mixer.request(dict(drink_recipe))
     return render_template('pumping.html', drink=drink, time=mix_time, drink_recipe=drink_recipe)
 
 
@@ -284,7 +284,7 @@ def prime():
             print("funny")
         else:
             print(f"Priming {qty} ml")
-            # mixer.prime(qty)
+            mixer.prime(qty)
     all_users = dbi.read_query(Dbq.USERS)
     return render_template('prime.html', all_users=all_users, prime_qty=prime_qty)
 
