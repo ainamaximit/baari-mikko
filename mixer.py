@@ -9,13 +9,13 @@ config.read('config.ini')
 
 class Mixer:
     def __init__(self):
-        self.max_spd = config.getint('MIXER', 'max_flow')  # 460 ml/min (7,66 ml/s) needs calibration
-        self.min_spd = config.getint('MIXER', 'min_flow')  # 46 ml/min (0,766 ml/s) needs calibration
+        self.max_spd = config.getfloat('MIXER', 'max_flow')  # 460 ml/min (7,66 ml/s) needs calibration
+        self.min_spd = config.getfloat('MIXER', 'min_flow')  # 46 ml/min (0,766 ml/s) needs calibration
 
-        self.raw_pin_layout = dict(config['PIN_LAYOUT'])
-        self.pinLayout = dict((k, int(v)) for k, v in self.raw_pin_layout.items())
+        #self.raw_pin_layout = dict(config['PIN_LAYOUT'])
+        #self.pinLayout = dict((k, int(v)) for k, v in self.raw_pin_layout.items())
 
-        # self.pinLayout = {1: 1, 2: 26, 3: 19, 4: 6, 5: 7, 6: 25, 7: 9, 8: 10, 9: 11}
+        self.pinLayout = {1: 1, 2: 26, 3: 19, 4: 6, 5: 7, 6: 25, 7: 9, 8: 10, 9: 11}
         self.pumps = {}
         self.freq = config.getint('MIXER', 'pwm_freq')
 
