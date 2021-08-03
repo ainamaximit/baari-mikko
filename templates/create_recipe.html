@@ -31,13 +31,12 @@
             </div>
             <div id="ingredients-list">
                 <div class="ingredients-list-row" id="first-ingredient-row">
-                    <div class="ingredients-list-row-remove hidden">
-                        <button onclick="removeRecipeIngredientRow(this)">-</button>
-                    </div>
+                    <div class="ingredients-list-row-remove hidden"></div>
                     <div class="ingredients-list-row-ingredient">
                         <select name="ingredient">
-                            <option>Lol</option>
-                            <option>Asd</option>
+                            {% for ingredient in ingredients|sort(attribute=1) %}
+                                <option value="{{ ingredient[0] }}">{{ ingredient[1] }}</option>
+                            {% endfor %}
                         </select>
                     </div>
                     <div class="ingredients-list-row-amount">

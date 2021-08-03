@@ -312,8 +312,10 @@ def create_recipe():
     if not current_user.admin:
         return redirect(url_for('index'))
 
+    ingredients = dbi.read_query(Dbq.ALL_INGREDIENTS)
+
     if request.method == 'GET':
-        return render_template('create_recipe.html')
+        return render_template('create_recipe.html', ingredients=ingredients)
     elif request.method == 'POST':
         print('lol')
     else:

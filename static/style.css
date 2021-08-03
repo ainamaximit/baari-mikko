@@ -196,7 +196,7 @@ body {
 }
 
 .add-recipe_name > #recipe-name {
-    width: 100%;
+    width: 70%;
 }
 
 #ingredients-header {
