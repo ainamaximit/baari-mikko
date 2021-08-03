@@ -1,12 +1,11 @@
 function login() {
-  var loginContent = document.getElementById('login-content');
-  var originalImage = loginContent.getAttribute('src');
+  var loginFlash = document.getElementById('flash');
 
-  loginContent.setAttribute('src', loginSpinner);
+  loginFlash.classList.add('show');
 
   // Return original icon
   setTimeout(function () {
-    loginContent.setAttribute('src', originalImage);
+    loginContent.classList.remove('show');
   }, 5000);
 
   window.location.assign(loginUrl);
