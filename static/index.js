@@ -25,7 +25,7 @@ function addRecipeIngredientRow() {
       element.value = 0;
     }
   })
-  
+
   ingredientsList.append(newRow);
 }
 

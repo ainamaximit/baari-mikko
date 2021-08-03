@@ -28,7 +28,7 @@
 
             {% endfor %}
 
-                <input type="submit" name="drink" value="None" class="button item light_red">
+                <button name="drink" class="button item light_red" onclick="window.location.assign('{{ url_for('create_recipe') }}')">UUSI</button>
 
         </form>
 
