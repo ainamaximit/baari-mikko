@@ -174,3 +174,60 @@ body {
 #flash.show > img {
     display: block;
 }
+
+.add-recipe_name {
+    display: flex;
+    flex-direction: column;
+    justify-content: left;
+}
+
+.add-recipe_name > label {}
+
+.add-recipe_name > #recipe-name {
+    width: 100%;
+}
+
+#ingredients-header {
+    display: flex;
+}
+
+#ingredients-header-ingredient {
+    flex: 4;
+}
+
+#ingredients-header-amount {
+    flex: 2;
+}
+
+#ingredients-list {
+    width: 100%;
+}
+
+.ingredients-list-row {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+
+.ingredients-list-row-remove {
+    flex: 1;
+    padding: 0.5em 1em;
+}
+
+.ingredients-list-row-remove.hidden {
+    visibility: hidden;
+}
+
+.ingredients-list-row-ingredient {
+    flex: 3;
+    padding-right: 2em;
+}
+
+.ingredients-list-row-amount {
+    flex: 2;
+    padding-right: 1em;
+}
+
+#ingredients-list #add-row {
+    width: 100%;
+}

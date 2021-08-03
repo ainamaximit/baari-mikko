@@ -12,8 +12,6 @@ import configparser
 config = configparser.ConfigParser()
 config.read('config.ini')
 
-
-
 app = Flask(__name__, static_url_path='/static')
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -25,7 +23,7 @@ dbi = DatabaseInterface(config.get('DATABASE', 'database'),
                         config.get('DATABASE', 'username'),
                         config.get('DATABASE', 'password'),
                         config.get('DATABASE', 'ip_address'))
-pool = mp.Pool(mp.cpu_count()-1)
+pool = mp.Pool(mp.cpu_count() - 1)
 mixer = Mixer()
 
 
@@ -189,10 +187,10 @@ def mix_drink():
     dt = datetime.now()
 
     print(drink)
-    drink_id = dbi.read_query(Dbq.GET_DRINK_ID, (drink, ))  # get drink id for order history
+    drink_id = dbi.read_query(Dbq.GET_DRINK_ID, (drink,))  # get drink id for order history
     dbi.execute_query(Dbq.ORDER, (current_user.serial, drink_id[0], dt))  # write to order history
 
-    drink_recipe = dbi.read_query(Dbq.AVAILABLE_RECIPE, (drink, ))
+    drink_recipe = dbi.read_query(Dbq.AVAILABLE_RECIPE, (drink,))
     print(drink_recipe)
     print(dict(drink_recipe))
     mix_time = 5
@@ -304,6 +302,20 @@ def recipes():
         drink_recipe = dbi.read_query(Dbq.RECIPE, drink_select)
         return render_template('recipes.html', name=name, drink_select=drink_select, drinks=all_drinks,
                                drink_recipe=drink_recipe, ingredients=ingredients)
+    else:
+        return redirect(url_for('index'))
+
+
+@app.route('/recipes/create', methods=['GET', 'POST'])
+@login_required
+def create_recipe():
+    if not current_user.admin:
+        return redirect(url_for('index'))
+
+    if request.method == 'GET':
+        return render_template('create_recipe.html')
+    elif request.method == 'POST':
+        print('lol')
     else:
         return redirect(url_for('index'))
 

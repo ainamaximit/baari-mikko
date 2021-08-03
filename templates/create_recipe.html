@@ -1,0 +1,57 @@
+{% extends "layout.html" %}
+
+{% block top %}
+
+    <div style="order: 1;" onclick="window.location='{{ url_for('admin') }}';" class="top_small button green2">
+        TAKAISIN
+    </div>
+
+    <div style="order: 2;" class="top_big button green2">
+        LUO RESEPTI
+    </div>
+
+    <div style="order: 5;" onclick="window.location='{{ url_for('logout') }}';" class="top_small button green2">
+        KIRJAUDU ULOS
+    </div>
+
+{% endblock %}
+
+{% block body %}
+
+    <form class="add-recipe">
+        <div class="add-recipe_name">
+            <label for="recipe-name">Nimi</label>
+            <input type="text" name="name" id="recipe-name">
+        </div>
+
+        <div class="ingredients-container">
+            <div id="ingredients-header">
+                <div id="ingredients-header-ingredient">Ainesosa</div>
+                <div id="ingredients-header-amount">Määrä</div>
+            </div>
+            <div id="ingredients-list">
+                <div class="ingredients-list-row" id="first-ingredient-row">
+                    <div class="ingredients-list-row-remove hidden">
+                        <button onclick="removeRecipeIngredientRow(this)">-</button>
+                    </div>
+                    <div class="ingredients-list-row-ingredient">
+                        <select name="ingredient">
+                            <option>Lol</option>
+                            <option>Asd</option>
+                        </select>
+                    </div>
+                    <div class="ingredients-list-row-amount">
+                        <input name="amount" type="number" step="1"> ml
+                    </div>
+                </div>
+                <div id="add-row">
+                    <button onclick="addRecipeIngredientRow()">+</button>
+                </div>
+            </div>
+        </div>
+        <div id="save-recipe-container">
+            <button id="save-recipe">TALLENNA</button>
+        </div>
+    </form>
+
+{% endblock %}
