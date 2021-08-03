@@ -13,6 +13,9 @@ function login() {
 
 function addRecipeIngredientRow() {
   const ingredientsList = document.getElementById('ingredients-list');
+  const addButton = ingredientsList.childNodes.item(ingredientsList.childNodes.length - 1)
+  ingredientsList.removeChild = addButton
+
   const newElementIdNum = ingredientsList.childNodes.length;
   const newElementId = `row-${newElementIdNum}`;
   const template = document.createElement('template');
@@ -35,6 +38,7 @@ function addRecipeIngredientRow() {
   `.trim();
 
   ingredientsList.append(template.content.firstChild);
+  ingredientsList.append(addButton)
 }
 
 function removeRecipeIngredientRow(id) {
