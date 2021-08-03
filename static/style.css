@@ -196,7 +196,9 @@ body {
 
 #ingredients-header {
     display: flex;
+    margin-top: 2em;
     padding-left: 2em;
+    font-size: 1.5em;
 }
 
 #ingredients-header-ingredient {
@@ -215,6 +217,7 @@ body {
     display: flex;
     flex-direction: row;
     width: 100%;
+    padding: 1em 0.5em;
 }
 
 .ingredients-list-row-remove {
@@ -236,7 +239,13 @@ body {
     padding-right: 1em;
 }
 
-#ingredients-list #add-row {
+#add-row {
     padding-left: 2em;
     width: 100%;
+}
+
+#add-row > button {
+    padding: 0.5em 1em;
+    font-size: 1.5em;
+    line-height: 1.5em;
 }
