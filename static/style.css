@@ -201,6 +201,7 @@ body {
 
 .ingredients-container {
     overflow: auto;
+    height: 40%;
 }
 
 #ingredients-header {
