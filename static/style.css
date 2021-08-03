@@ -175,13 +175,20 @@ body {
     display: block;
 }
 
+.add-recipe {
+    margin-top: 2em;
+}
+
 .add-recipe_name {
     display: flex;
     flex-direction: column;
     justify-content: left;
+    padding-left: 2em;
 }
 
-.add-recipe_name > label {}
+.add-recipe_name > label {
+    padding: 0.5em 1em;
+}
 
 .add-recipe_name > #recipe-name {
     width: 100%;
@@ -189,6 +196,7 @@ body {
 
 #ingredients-header {
     display: flex;
+    padding-left: 2em;
 }
 
 #ingredients-header-ingredient {
@@ -229,5 +237,6 @@ body {
 }
 
 #ingredients-list #add-row {
+    padding-left: 2em;
     width: 100%;
 }
