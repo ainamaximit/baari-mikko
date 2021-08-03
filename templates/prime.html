@@ -19,9 +19,9 @@
 {% block body %}
 
     <form action="{{ url_for('prime') }}" method="post" class="container">
-        <input class="item button blue" onclick="document.getElementById('prime').stepUp(5);" type="button" name="" value="+">
-        <input type="number" class="item field" id="prime" name="prime" value="{{ prime_qty }}">
         <input class="item button blue" onclick="document.getElementById('prime').stepDown(5);" type="button" name="" value="-">
+        <input type="number" class="item field" id="prime" name="prime" value="{{ prime_qty }}">
+        <input class="item button blue" onclick="document.getElementById('prime').stepUp(5);" type="button" name="" value="+">
         <button class="button green item" type="submit">PUMPPAA</button>
     </form>
 
