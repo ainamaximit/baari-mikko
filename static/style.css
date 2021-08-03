@@ -199,6 +199,10 @@ body {
     width: 100%;
 }
 
+.ingredients-container {
+    overflow-y: auto;
+}
+
 #ingredients-header {
     display: flex;
     margin-top: 2em;
@@ -207,8 +211,8 @@ body {
 }
 
 #ingredients-header-ingredient {
-    width: 50%;
-    margin-left: 15%;
+    width: 60%;
+    margin-left: 5%;
 }
 
 #ingredients-header-amount {
@@ -227,7 +231,7 @@ body {
 }
 
 .ingredients-list-row-remove {
-    width: 15%;
+    width: 5%;
     padding: 0.5em 1em;
 }
 
@@ -236,7 +240,7 @@ body {
 }
 
 .ingredients-list-row-ingredient {
-    width: 50%;
+    width: 60%;
     padding-right: 2em;
 }
 
