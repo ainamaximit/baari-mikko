@@ -20,7 +20,7 @@ function addRecipeIngredientRow() {
   template.innerHTML = `
                 <div class="ingredients-list-row" id="${newElementId}">
                     <div class="ingredients-list-row-remove">
-                        <button onclick="removeRecipeIngredientRow(${newElementId})">-</button>
+                        <button onclick="removeRecipeIngredientRow('${newElementId}')">-</button>
                     </div>
                     <div class="ingredients-list-row-ingredient">
                         <select name="ingredient">
