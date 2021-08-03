@@ -2,8 +2,8 @@
 
 {% block top %}
 
-    <div style="order: 1;" onclick="window.location='{{ url_for('drinks') }}';" class="top_small button opaque">
-        <img src="/static/w-drink.png" alt="TILAA" class="icon">
+    <div style="order: 1;" onclick="login()" class="top_small button opaque">
+        <img src="/static/w-drink.png" alt="TILAA" class="icon" id="login-content">
     </div>
 
     {% if logged %}
