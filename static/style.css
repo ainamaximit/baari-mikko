@@ -176,7 +176,7 @@ body {
 }
 
 .add-recipe {
-    margin-top: 2em;
+    margin-top: 1em;
 }
 
 .add-recipe input, .add-recipe select {
@@ -236,6 +236,12 @@ body {
 
 .ingredients-list-row-remove.hidden {
     visibility: hidden;
+}
+
+.ingredients-list-row-remove > button {
+    height: 1.5em;
+    width: 1.5em;
+    font-size: 1.25em;
 }
 
 .ingredients-list-row-ingredient {
