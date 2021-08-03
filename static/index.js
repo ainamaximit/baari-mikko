@@ -12,11 +12,14 @@ function login() {
 }
 
 function addRecipeIngredientRow() {
+  const newElementIdNum = document.getElementById('first-ingredient-row').childNodes.length;
+  const newElementId = `row-${newElementIdNum}`;
   const template = document.createElement('template');
+
   template.innerHTML = `
-                <div class="ingredients-list-row" id="first-ingredient-row">
+                <div class="ingredients-list-row" id="${newElementId}">
                     <div class="ingredients-list-row-remove">
-                        <button onclick="removeRecipeIngredientRow(this)">-</button>
+                        <button onclick="removeRecipeIngredientRow(${newElementId})">-</button>
                     </div>
                     <div class="ingredients-list-row-ingredient">
                         <select name="ingredient">
@@ -34,7 +37,7 @@ function addRecipeIngredientRow() {
   ingredientsList.append(template.content.firstChild);
 }
 
-function removeRecipeIngredientRow(element) {
-  let parent = element.parentElement;
-  parent.delete();
+function removeRecipeIngredientRow(id) {
+  const element = document.getElementById(id);
+  element.delete();
 }
