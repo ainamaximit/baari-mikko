@@ -207,11 +207,12 @@ body {
 }
 
 #ingredients-header-ingredient {
-    flex: 4;
+    width: 50%;
+    margin-left: 15%;
 }
 
 #ingredients-header-amount {
-    flex: 2;
+    width: 35%;
 }
 
 #ingredients-list {
