@@ -9,5 +9,5 @@ function login() {
     loginContent.setAttribute('src', originalImage);
   }, 5000);
 
-  window.location(loginUrl);
+  window.location.assign(loginUrl);
 }
