@@ -39,5 +39,5 @@ function addRecipeIngredientRow() {
 
 function removeRecipeIngredientRow(id) {
   const element = document.getElementById(id);
-  element.delete();
+  element.parentNode.removeChild(element);
 }
