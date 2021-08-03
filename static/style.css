@@ -187,7 +187,7 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: left;
-    padding-left: 2em;
+    padding: 0 2em;
 }
 
 .add-recipe_name > label {
@@ -254,9 +254,8 @@ body {
 }
 
 #add-row > button {
-    padding: 0.5em 1em;
+    padding: 0.25em 0.5em;
     font-size: 1.5em;
-    line-height: 1.5em;
 }
 
 #save-recipe-container {
