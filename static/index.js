@@ -12,9 +12,10 @@ function login() {
 }
 
 function addRecipeIngredientRow() {
-  const newIngredientRow = `
+  const template = document.createElement('template');
+  template.innerHTML = `
                 <div class="ingredients-list-row" id="first-ingredient-row">
-                    <div class="ingredients-list-row-remove hidden">
+                    <div class="ingredients-list-row-remove">
                         <button onclick="removeRecipeIngredientRow(this)">-</button>
                     </div>
                     <div class="ingredients-list-row-ingredient">
@@ -27,10 +28,10 @@ function addRecipeIngredientRow() {
                         <input name="amount" type="number" step="1"> ml
                     </div>
                 </div>
-  `;
+  `.trim();
   let ingredientsList = document.getElementById('ingredients-list');
 
-  ingredientsList.append(newIngredientRow);
+  ingredientsList.append(template.content.firstChild);
 }
 
 function removeRecipeIngredientRow(element) {
