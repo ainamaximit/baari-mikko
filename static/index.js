@@ -12,21 +12,25 @@ function login() {
 }
 
 function addRecipeIngredientRow() {
-  let ingredientRow = document.getElementById('first-ingredient-row');
+  const newIngredientRow = `
+                <div class="ingredients-list-row" id="first-ingredient-row">
+                    <div class="ingredients-list-row-remove hidden">
+                        <button onclick="removeRecipeIngredientRow(this)">-</button>
+                    </div>
+                    <div class="ingredients-list-row-ingredient">
+                        <select name="ingredient">
+                            <option>Lol</option>
+                            <option>Asd</option>
+                        </select>
+                    </div>
+                    <div class="ingredients-list-row-amount">
+                        <input name="amount" type="number" step="1"> ml
+                    </div>
+                </div>
+  `;
   let ingredientsList = document.getElementById('ingredients-list');
 
-  let newRow = ingredientRow.cloneNode(true);
-  newRow.childNodes.forEach((element, _, __) => {
-    const name = element.getAttribute('name')
-
-    if (name === 'ingredient') {
-      element.value = null;
-    } else if (name === 'amount') {
-      element.value = 0;
-    }
-  })
-
-  ingredientsList.append(newRow);
+  ingredientsList.append(newIngredientRow);
 }
 
 function removeRecipeIngredientRow(element) {
