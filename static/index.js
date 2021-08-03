@@ -12,7 +12,8 @@ function login() {
 }
 
 function addRecipeIngredientRow() {
-  const newElementIdNum = document.getElementById('first-ingredient-row').childNodes.length;
+  const ingredientsList = document.getElementById('ingredients-list');
+  const newElementIdNum = ingredientsList.childNodes.length;
   const newElementId = `row-${newElementIdNum}`;
   const template = document.createElement('template');
 
@@ -32,7 +33,6 @@ function addRecipeIngredientRow() {
                     </div>
                 </div>
   `.trim();
-  let ingredientsList = document.getElementById('ingredients-list');
 
   ingredientsList.append(template.content.firstChild);
 }
