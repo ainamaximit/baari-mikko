@@ -20,67 +20,21 @@
 
     {% if drinks is defined %}
 
-        {% if ( (drink_select == None) or (drink_select == 'None') ) %}
+        <form action="{{ url_for('edit_recipe') }}" method="get" class="container">
 
-            <form action="{{ url_for('recipes') }}" method="post" class="container">
+            {% for drink in drinks %}
 
-                {% for drink in drinks %}
+                <input type="submit" name="drink" value="{{ drink.1 }}" class="button item green">
 
-                    <input type="submit" name="drink" value="{{ drink.1 }}" class="button item green">
+            {% endfor %}
 
-                {% endfor %}
+                <input type="submit" name="drink" value="None" class="button item light_red">
 
-            </form>
-
-        {% else %}
-
-            <form action="{{ url_for('recipes') }}" method="post" class="container">
-                <button type="submit" name="drink" value="None" class="button item green">
-                    Peruuta "{{ drink_select }}" drinkin muokkaus.
-                </button>
-            </form>
-            <form class="container vertical" action="{{ url_for('save_recipe') }}" method="post">
-
-                {% for ingredient in drink_recipe %}
-
-                    <div class="container" id="{{ ingredient[0] }}">
-                    <select name="D{{ ingredient[0] }}" class="item20 field green" >
-
-                    {% for item in ingredients %}
-
-                        {% if item[0] == ingredient[2] %}
-
-                            <option selected="selected" value="{{ item[0] }}">{{ item[1] }}</option>
-
-                        {% else %}
-
-                            <option value="{{ item[0] }}">{{ item[1] }}</option>
-
-                        {% endif %}
-
-                    {% endfor %}
-
-                    </select>
-                    <input class="item button blue" onclick="document.getElementById('qty{{ ingredient[0] }}').stepUp(10);" type="button" name="" value="+">
-                    <input class="item field" type="number" id="qty{{ ingredient[0] }}" name="I{{ ingredient[0] }}" value="{{ ingredient[3] }}">
-                    <input class="item button blue" onclick="document.getElementById('qty{{ ingredient[0] }}').stepDown(10);" type="button" name="" value="-">
-                    <input class="item button red" type="button" onclick="document.getElementById('{{ ingredient[0] }}').remove();" name="" value="POISTA">
-                    </div>
-
-                {% endfor %}
-
-                <div class="container">
-                <input type="button" class="button item" value="Lisää raaka-aine (TBA)">
-                <input type="submit" class="button item" value="Tallenna muutokset">
-                <input type="button" class="button item red" value="Poista drinkki (TBA)">
-                </div>
-            </form>
-
-    {% endif %}
+        </form>
 
     {% else %}
 
-        Error!
+        Fucked up!
 
     {% endif %}
 
