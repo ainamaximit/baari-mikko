@@ -24,7 +24,7 @@ def calibrate():
             test = {pump: qty}
 
             mix_time = mixer.request(test)
-            print(f"Pumping for {round(mix_time, 1)} seconds.")
+            #print(f"Pumping for { round(mix_time, 1) } seconds.")
             sleep(mix_time)
             result = int(input("Type result in ml: "))
             results.append(result/mix_time)
