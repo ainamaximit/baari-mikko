@@ -191,7 +191,8 @@ body {
 }
 
 .add-recipe_name > label {
-    padding: 0.5em 1em;
+    padding: 0.5em 1em 0.5em 0;
+    font-size: 1.5em;
 }
 
 .add-recipe_name > #recipe-name {
@@ -225,7 +226,7 @@ body {
 }
 
 .ingredients-list-row-remove {
-    flex: 1;
+    width: 15%;
     padding: 0.5em 1em;
 }
 
@@ -234,12 +235,12 @@ body {
 }
 
 .ingredients-list-row-ingredient {
-    flex: 3;
+    width: 50%;
     padding-right: 2em;
 }
 
 .ingredients-list-row-amount {
-    flex: 2;
+    width: 35%;
     padding-right: 1em;
 }
 
@@ -251,5 +252,19 @@ body {
 #add-row > button {
     padding: 0.5em 1em;
     font-size: 1.5em;
+    line-height: 1.5em;
+}
+
+#save-recipe-container {
+    width: 100%;
+    margin-top: 2em;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+#save-recipe-container > button {
+    padding: 0.5em 1em;
+    font-size: 2em;
     line-height: 1.5em;
 }
