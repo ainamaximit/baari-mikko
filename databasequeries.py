@@ -49,12 +49,14 @@ class DatabaseQueries:
             """
 
     INSERT_RECIPE = """
-            INSERT INTO recipes (id, drink_id, ingredient_id, quantity)
-            VALUES (%s,%s,%s,%s)
-            ON CONFLICT (id)
-            DO UPDATE SET drink_id = EXCLUDED.drink_id, ingredient_id = EXCLUDED.ingredient_id,
-            quantity = EXCLUDED.quantity
-            """
+                INSERT INTO recipes (drink_id, ingredient_id, quantity)
+                VALUES (%s,%s,%s)
+                """
+
+    INSERT_DRINK = """
+                INSERT INTO drinks (drink)
+                VALUES (%s)
+                """
 
     CREATE_USER = """
             INSERT INTO users (name, face, img, admin)
@@ -122,3 +124,15 @@ class DatabaseQueries:
             SELECT id, name, img, admin FROM users
             WHERE name=%s
             """
+
+    DRINK_EXISTS = """
+            SELECT drink FROM drinks WHERE drink = %s;
+    """
+
+    DELETE_RECIPE = """
+            DELETE FROM recipes WHERE drink_id = %s;
+            """
+
+    GET_INGREDIENT_ID = """
+            SELECT id FROM ingredients WHERE ingredient = %s;
+    """
