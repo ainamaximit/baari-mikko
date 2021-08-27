@@ -26,28 +26,37 @@ class Mixer:
             self.pumps[key] = GPIO.PWM(value, self.freq)
             self.pumps[key].start(0)
 
-    def mix(self, recipe, min_time):
+    def mix(self, recipe):
         """
 
         :param recipe:
         :param min_time:
         :return:
         """
-        for key, value in recipe.items():
-            target = (((value / min_time) - self.min_spd) / (self.max_spd - self.min_spd)) * 100
-            print(f"{key}:{target}")
-            recipe[key] = target
+        run_times = {}
+        running_pumps = {}
+        running_pumps_count = 0
 
         for key, value in recipe.items():
-            self.pumps[key].ChangeDutyCycle(value)
-            print(f"{self.pumps[key]} pwm cycle to {value}")
+            run_time = value / self.max_spd
+            run_times[key] = run_time
 
-        time.sleep(min_time)
-        print("Pausing pumps...")
+        for key, value in run_times.items():
+            self.pumps[key].ChangeDutyCycle(100)
+            running_pumps[key] = True
+            running_pumps_count += 1
+            print(f"{self.pumps[key]} pwm cycle to 100")
 
-        for key, value in self.pumps.items():
-            self.pumps[key].ChangeDutyCycle(0)
-            print(f"{key} pwm cycle to 0")
+        start_time = time.time()
+
+        while running_pumps_count > 0:
+            cur_time = time.time()
+            for key, value in run_times.items():
+                if cur_time - start_time > value and running_pumps[key] is True:
+                    self.pumps[key].ChangeDutyCycle(0)
+                    running_pumps[key] = False
+                    running_pumps_count -= 1
+            time.sleep(0.1)
 
     def request(self, recipe):
         """
@@ -64,7 +73,7 @@ class Mixer:
         except Exception as e:
             print(f"mixer.py: Error in recipe parsing. {e}")
         else:
-            t = Thread(target=self.mix, args=(recipe, min_time))
+            t = Thread(target=self.mix, args=(recipe))
             t.start()
             return min_time
 
@@ -84,7 +93,7 @@ class Mixer:
 
             print("Priming system...")
 
-            t = Thread(target=self.mix, args=(prime_pumps, min_time))
+            t = Thread(target=self.mix, args=(prime_pumps))
             t.start()
             return min_time
         except Exception as e:
