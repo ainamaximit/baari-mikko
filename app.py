@@ -8,6 +8,7 @@ from datetime import datetime
 import multiprocessing as mp
 import time
 import configparser
+import random as rand
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -147,7 +148,13 @@ def drinks():
     name = current_user.id
     result = dbi.read_query(Dbq.AVAILABLE_DRINKS)
     available_drinks = [item for t in result for item in t]
-    return render_template('drinks.html', name=name, drinks=available_drinks)
+    print(available_drinks)
+    print(len(available_drinks))
+
+    random = rand.randint(0, len(available_drinks)-1)
+    joker = available_drinks[random]
+    #available_drinks.append(joker)
+    return render_template('drinks.html', name=name, drinks=available_drinks, joker=joker)
 
 
 @app.route('/history')
@@ -306,20 +313,15 @@ def recipes():
         return redirect(url_for('index'))
 
 
-@app.route('/recipes/create', methods=['GET', 'POST'])
+@app.route('/create_recipe', methods=['GET', 'POST'])
 @login_required
 def create_recipe():
     if not current_user.admin:
         return redirect(url_for('index'))
-
+    if request.method == 'POST':
+        print(request.form.get['ingredient'])
     ingredients = dbi.read_query(Dbq.ALL_INGREDIENTS)
-
-    if request.method == 'GET':
-        return render_template('create_recipe.html', ingredients=ingredients)
-    elif request.method == 'POST':
-        print('lol')
-    else:
-        return redirect(url_for('index'))
+    return render_template('create_recipe.html', ingredients=ingredients)
 
 
 @app.route('/pumps', methods=['GET', 'POST'])

@@ -18,7 +18,7 @@
 
 {% block body %}
 
-    <form class="add-recipe">
+    <form name="form1" action="{{ url_for('create_recipe') }}" method="get" class="add-recipe">
         <div class="add-recipe_name">
             <label for="recipe-name">Nimi</label>
             <input type="text" name="name" id="recipe-name">

@@ -14,10 +14,10 @@ dbi = DatabaseInterface(config.get('DATABASE', 'database'),
 
 # impostor
 data = {
-    "name": "KILLSHOT",
+    "name": "Rommicola",
     "ingredients": {
-        "Vodka": 50,
-        "Rommi": 150
+        "Rommi": 50,
+        "Cola": 150
     }
 }
 
