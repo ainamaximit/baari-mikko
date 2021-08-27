@@ -7,7 +7,7 @@
     </div>
 
     <div style="order: 2;" class="top_big button blue2">
-        Pumppujen konfigurointi
+        Raaka-aineet
     </div>
 
     <div style="order: 5;" onclick="window.location='{{ url_for('logout') }}';" class="top_small button blue2">
@@ -47,9 +47,9 @@
 
         {% endfor %}
 
-        <input class="light_red button item" type="reset" value="Palauta kentät">
-        <input class="red button item" type="button" value="Tyhjennä kentät" onclick="for (let i = 1;i<=9;i++) {document.getElementById(i.toString()).value = 'None'}">
-        <input class="green button item" type="submit" value="Tallenna muutokset">
+        <input class="light_red button item" type="reset" value="Peruuta">
+        <input class="red button item" type="button" value="Tyhjennä" onclick="for (let i = 1;i<=9;i++) {document.getElementById(i.toString()).value = 'None'}">
+        <input class="green button item" type="submit" value="Tallenna">
 
     </form>
 
