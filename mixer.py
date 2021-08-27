@@ -26,7 +26,7 @@ class Mixer:
             self.pumps[key] = GPIO.PWM(value, self.freq)
             self.pumps[key].start(0)
 
-    def mix(self, recipe):
+    def mix(self, recipe, lol=0):
         """
 
         :param recipe:
@@ -73,7 +73,7 @@ class Mixer:
         except Exception as e:
             print(f"mixer.py: Error in recipe parsing. {e}")
         else:
-            t = Thread(target=self.mix, args=(recipe))
+            t = Thread(target=self.mix, args=(recipe, 0))
             t.start()
             return min_time
 
@@ -93,7 +93,7 @@ class Mixer:
 
             print("Priming system...")
 
-            t = Thread(target=self.mix, args=(prime_pumps))
+            t = Thread(target=self.mix, args=(prime_pumps, 0))
             t.start()
             return min_time
         except Exception as e:
