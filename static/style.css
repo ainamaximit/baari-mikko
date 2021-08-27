@@ -174,3 +174,105 @@ body {
 #flash.show > img {
     display: block;
 }
+
+.add-recipe {
+    margin-top: 1em;
+}
+
+.add-recipe input, .add-recipe select {
+    padding: 0.5em 1em;
+}
+
+.add-recipe_name {
+    display: flex;
+    flex-direction: column;
+    justify-content: left;
+    padding: 0 2em;
+}
+
+.add-recipe_name > label {
+    padding: 0.5em 1em 0.5em 0;
+    font-size: 1.5em;
+}
+
+.add-recipe_name > #recipe-name {
+    width: 70%;
+}
+
+#ingredients-header {
+    display: flex;
+    margin-top: 2em;
+    padding-left: 2em;
+    font-size: 1.5em;
+}
+
+#ingredients-header-ingredient {
+    width: 60%;
+    margin-left: 5%;
+}
+
+#ingredients-header-amount {
+    width: 35%;
+}
+
+#ingredients-list {
+    width: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: 20vh;
+}
+
+.ingredients-list-row {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    padding: 0.5em;
+}
+
+.ingredients-list-row-remove {
+    width: 5%;
+    padding: 0.5em 1em;
+}
+
+.ingredients-list-row-remove.hidden {
+    visibility: hidden;
+}
+
+.ingredients-list-row-remove > button {
+    height: 1.5em;
+    width: 1.5em;
+    font-size: 1.25em;
+}
+
+.ingredients-list-row-ingredient {
+    width: 60%;
+    padding-right: 2em;
+}
+
+.ingredients-list-row-amount {
+    width: 35%;
+    padding-right: 1em;
+}
+
+#add-row {
+    padding-left: 2em;
+    width: 100%;
+}
+
+#add-row > button {
+    padding: 0.25em 0.5em;
+    font-size: 1.5em;
+}
+
+#save-recipe-container {
+    width: 100%;
+    margin-top: 1em;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+#save-recipe-container > button {
+    padding: 0.25em 0.5em;
+    font-size: 1.25em;
+}
