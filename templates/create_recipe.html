@@ -18,7 +18,7 @@
 
 {% block body %}
 
-    <form name="form1" action="{{ url_for('create_recipe') }}" method="get" class="add-recipe">
+    <form name="form1" action="{{ url_for('submit_recipe') }}" method="get" class="add-recipe">
         <div class="add-recipe_name">
             <label for="recipe-name">Nimi</label>
             <input type="text" name="name" id="recipe-name">
@@ -31,11 +31,14 @@
             </div>
             <div id="ingredients-list">
                 <div class="ingredients-list-row" id="first-ingredient-row">
-                    <div class="ingredients-list-row-remove hidden"></div>
+                    <div class="ingredients-list-row-remove hidden">
+                        <button onclick="removeRow(this)">-</button>
+                    </div>
+
                     <div class="ingredients-list-row-ingredient">
                         <select name="ingredient">
                             {% for ingredient in ingredients|sort(attribute=1) %}
-                                <option value="{{ ingredient[0] }}">{{ ingredient[1] }}</option>
+                                <option value="{{ ingredient[1] }}">{{ ingredient[1] }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -45,7 +48,8 @@
                 </div>
             </div>
             <div id="add-row">
-                <button type="button" onclick="addRecipeIngredientRow()">+</button>
+{#                <button type="button" onclick="addRecipeIngredientRow()">+</button>#}
+                <button type="button" onclick="duplicateRow()">+</button>
             </div>
         </div>
         <div id="save-recipe-container">
