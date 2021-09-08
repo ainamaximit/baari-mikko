@@ -1,3 +1,5 @@
+import json
+
 from flask import Flask, render_template, request, Response, redirect, url_for, send_from_directory
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
 from facecam import compare, capture, learn, feed, CameraStream
@@ -5,6 +7,7 @@ from databaseinterface import DatabaseInterface
 from databasequeries import DatabaseQueries as Dbq
 from mixer import Mixer
 from datetime import datetime
+from new_recipe import store_recipe
 import multiprocessing as mp
 import time
 import configparser
@@ -318,10 +321,40 @@ def recipes():
 def create_recipe():
     if not current_user.admin:
         return redirect(url_for('index'))
-    if request.method == 'POST':
-        print(request.form.get['ingredient'])
+
     ingredients = dbi.read_query(Dbq.ALL_INGREDIENTS)
     return render_template('create_recipe.html', ingredients=ingredients)
+
+
+@app.route('/submit_recipe', methods=['GET'])
+@login_required
+def submit_recipe():
+    if not current_user.admin:
+        return redirect(url_for('index'))
+
+    print(request.args)
+    args = dict(request.args)
+    print(len(args))
+    asd = []
+    for key, value in args.items():
+        print(value)
+        asd.append(value)
+    name = asd[0]
+    qtys = asd[::2]
+    qtys.pop(0)
+    print(type(qtys))
+    # qtysi = [int(i) for i in qtys]
+    qtysi = list(map(int, qtys))
+    asd.pop(0)
+    ings = asd[::2]
+    recipe = dict(zip(ings, qtysi))
+    print(recipe)
+    final = {"name": name, "ingredients": recipe}
+    print(json.dumps(final))
+    store_recipe(final)
+
+
+    return redirect(url_for('index'))
 
 
 @app.route('/pumps', methods=['GET', 'POST'])
