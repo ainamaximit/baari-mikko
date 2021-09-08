@@ -22,11 +22,19 @@
 
         <form action="{{ url_for('recipes') }}" method="get" class="container">
 
-            {% for drink in drinks %}
+            <label>
+                Muokkaa:
+                <select>
 
-                <input type="submit" name="drink" value="{{ drink.1 }}" class="button item green">
+                    {% for drink in drinks %}
 
-            {% endfor %}
+                        <option name="{{ drink.1 }}" value="{{ drink.1 }}" class="button item green">
+
+                    {% endfor %}
+
+                </select>
+            </label>
+
 
         </form>
 
