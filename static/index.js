@@ -41,3 +41,30 @@ function removeRecipeIngredientRow(id) {
   const element = document.getElementById(id);
   element.parentNode.removeChild(element);
 }
+
+/**
+ * Nikon sahellykset
+ *
+ * */
+
+let i = 1;
+const original = document.getElementById('first-ingredient-row');
+
+function duplicateRow() {
+    // clone first-ingredient-row
+    const clone = original.cloneNode(true);
+    clone.id = ++i + "-ingredient-row";
+    original.parentNode.appendChild(clone);
+
+    const element = document.getElementById(clone.id);
+    element.getElementsByTagName("select")[0].setAttribute("name", "ingredient"+i);
+    element.getElementsByTagName("input")[0].setAttribute("name", "amount"+i);
+
+    // display remove button
+    const removeButton = document.getElementById(clone.id).getElementsByClassName("ingredients-list-row-remove")[0];
+    removeButton.classList.remove("hidden");
+}
+
+function removeRow(element) {
+  element.parentElement.parentElement.remove();
+}
