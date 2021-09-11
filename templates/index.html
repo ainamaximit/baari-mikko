@@ -38,25 +38,25 @@
         <video autoplay="true" id="videoElement" style="transform: scaleX(-1);" class="video"></video>
     </div>
     <script>
-      const video = document.querySelector("#videoElement");
+      window.addEventListener('load', (_) => {
+        const video = document.querySelector("#videoElement");
 
-      if (!video) return
-
-      if (navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({
-          video: {
-            frameRate: {
-              ideal: 30,
-              max: 30
+        if (navigator.mediaDevices.getUserMedia && video) {
+          navigator.mediaDevices.getUserMedia({
+            video: {
+              frameRate: {
+                ideal: 30,
+                max: 30
+              }
             }
-          }
-        }).then(function (stream) {
-          video.srcObject = stream;
-        })
-          .catch(function (error) {
-            console.log(`Something went wrong! ${error.message}`);
-          });
-      }
+          }).then(function (stream) {
+            video.srcObject = stream;
+          })
+            .catch(function (error) {
+              console.log(`Something went wrong! ${error.message}`);
+            });
+        }
+      })
 </script>
 
     <div id="flash"><img src="/static/spinner.gif" alt="LOADING"></div>
