@@ -43,23 +43,4 @@ function removeRecipeIngredientRow(id) {
 }
 
 function initCameraFeed() {
-  const video = document.querySelector("#videoElement");
-
-  if (!video) return
-
-  if (navigator.mediaDevices.getUserMedia) {
-    navigator.mediaDevices.getUserMedia({
-      video: {
-        frameRate: {
-          ideal: 30,
-          max: 30
-        }
-      }
-    }).then(function (stream) {
-      video.srcObject = stream;
-    })
-      .catch(function (error) {
-        console.log(`Something went wrong! ${error.message}`);
-      });
-  }
 }
